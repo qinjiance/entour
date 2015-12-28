@@ -6,13 +6,13 @@
 
 	<!-- 要调用的工作类 -->
 	<bean id="carDesJob" class="com.kay.quartz.QuartzJob">
-		<property name="localPath">${quartz.cron.carDesJob.localPath}</property>
-		<property name="ftpHost">${quartz.cron.carDesJob.ftpHost}</property>
-		<property name="ftpPort">${quartz.cron.carDesJob.ftpPort}</property>
-		<property name="ftpPath">${quartz.cron.carDesJob.ftpPath}</property>
-		<property name="ftpFilename">${quartz.cron.carDesJob.ftpFilename}</property>
-		<property name="ftpUsername">${quartz.cron.carDesJob.ftpUsername}</property>
-		<property name="ftpPassword">${quartz.cron.carDesJob.ftpPassword}</property>
+		<property name="localPath" value="${quartz.cron.carDesJob.localPath}" />
+		<property name="ftpHost" value="${quartz.cron.carDesJob.ftpHost}" />
+		<property name="ftpPort" value="${quartz.cron.carDesJob.ftpPort}" />
+		<property name="ftpPath" value="${quartz.cron.carDesJob.ftpPath}" />
+		<property name="ftpFilename" value="${quartz.cron.carDesJob.ftpFilename}" />
+		<property name="ftpUsername" value="${quartz.cron.carDesJob.ftpUsername}" />
+		<property name="ftpPassword" value="${quartz.cron.carDesJob.ftpPassword}" />
 	</bean>
 	<!-- 定义调用对象和调用对象的方法 -->
 	<bean id="carDesTask"
