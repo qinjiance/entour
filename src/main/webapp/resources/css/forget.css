@@ -1,0 +1,32 @@
+label{vertical-align:middle; font-family:tahoma; font-family:"Microsoft YaHei";}
+#forget{width:500px; height:359px; position:relative; overflow:hidden; margin: 40px 250px;}
+.forget_from{background:#f3f3f3; height:303px; padding:0 0 0 42px;}
+.forget_title{font-size:24px; color:#626262; padding-top:10px; height:45px;padding-bottom:20px;}
+.forget_btn{height:56px; background:url(../img/submit_01.png) no-repeat center top;display:block;_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../img/client/forgetbtn_bg8.png', sizingMethod='scale');}
+.forget_li{height:41px; line-height:30px;}
+.forget_li a{color:#F27902}
+.forget_nm{font-size:14px; color:#848484; padding-right:12px;}
+.forget_input{width:198px; height:18px; line-height:18px; border:1px solid #d7d7d7; background:#FFF; color:#666; padding:5px 3px; font-size:14px;}
+.forget_width{width:82px;}
+.forget_ps{padding:0 0 0 8px; color:#626262; }
+.forget_ps span{font-size:12px;}
+.forget_err{background:url(../img/err_01.png) no-repeat 0 center; color:#626262; padding:0 0 0 24px;}
+.forget_ok{background:url(../img/ok_01.png) no-repeat 0 center; color:#626262; padding:0 0 0 24px;}
+.forget_yzm{background:url(../img/yzm_01.png) no-repeat 0 0; width:104px; height:30px; border:0 none; font-size:12px !important; color:#FFF; cursor:pointer; font-family:"Microsoft YaHei";}
+.forget_li2{padding:0 0 0 68px;}
+.forget_mx{background:url(../img/ma_01.png) no-repeat 0 0; height:40px;}
+.forget_line{height:4px; line-height:0; font-size:0; overflow:hidden; display:block;}
+.forget_qd1{background:#ffc174; width:68px;}
+.forget_qd2{background:#fa9f31; width:136px;}
+.forget_qd3{background:#f27902; width:206px;}
+
+.forget_font{height:30px; text-align:center; clear:both;}
+.forget_font span{float:left; height:30px; text-align:center; width:69px;}
+.forget_font span.forget_c1{color:#ffc174;}
+.forget_font span.forget_c2{color:#fa9f31;}
+.forget_font span.forget_c3{color:#f27902;}
+
+.forget_submit{width:500px; height:56px; line-height:56px; text-align:center; font-size:24px; color:#FFF!important; display:block;}
+.forget_submit:hover{text-decoration:none;}
+
+.pub_abso{vertical-align:middle;}

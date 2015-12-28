@@ -1,0 +1,19 @@
+<%@ page language="java" contentType="text/html; charset=utf-8"
+	pageEncoding="utf-8"%>
+<div class="userLeft">
+	<p>
+		<a class="${left==0?'on':''}" href="${ctx}/user/userInfo">账号信息</a>
+	</p>
+	<p>
+		<a class="${left==1?'on':''}" href="${ctx}/user/chPwd">修改密码</a>
+	</p>
+	<p>
+		<a class="${left==2?'on':''}" href="${ctx}/user/order">我的订单</a>
+	</p>
+	<p>
+		<a class="${left==3?'on':''}" href="${ctx}/user/cart">购物车</a>
+	</p>
+	<p>
+		<a class="${left==4?'on':''}" href="${ctx}/user/favo">收藏夹</a>
+	</p>
+</div>

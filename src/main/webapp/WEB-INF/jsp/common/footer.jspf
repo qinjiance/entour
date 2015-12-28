@@ -1,0 +1,10 @@
+<%@ page language="java" contentType="text/html; charset=utf-8"
+	pageEncoding="utf-8"%>
+<div class="newpage bottom ${color}">
+	<div>
+		<p>
+			<em></em><span>关于我们</span> | <span>预定须知</span>
+		</p>
+		<p>Copyright © 2015 Entour Co.,Ltd.All rights reserved.</p>
+	</div>
+</div>

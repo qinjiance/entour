@@ -1,0 +1,34 @@
+label{vertical-align:middle; font-family:tahoma; font-family:"Microsoft YaHei";}
+#loginLogo img{width: 560px; height: 300px; margin: 40px 10px;}
+#login{width:400px; height:300px; position:relative; overflow:hidden; margin: 40px 10px;}
+.login_from{background:#f3f3f3; height:250px; padding:0 0 0 42px;}
+.login_title{font-size:24px; color:#626262; padding-top:10px; height:45px;padding-bottom:20px;}
+.login_btn{height:56px; background:url(../img/submit_01.png) no-repeat center top;display:block;_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../img/client/loginbtn_bg8.png', sizingMethod='scale');}
+.login_li{height:41px; line-height:30px;}
+.login_li a{color:#F27902}
+.login_nm{font-size:14px; color:#848484; padding-right:12px;}
+.login_input{width:198px; height:18px; line-height:18px; border:1px solid #d7d7d7; background:#FFF; color:#666; padding:5px 3px; font-size:14px;}
+.login_width{width:82px;}
+.login_ps{padding:0 0 0 8px; color:#626262; }
+.login_ps span{font-size:12px;}
+.login_err{background:url(../img/err_01.png) no-repeat 0 center; color:#626262; padding:0 0 0 24px;}
+.login_ok{background:url(../img/ok_01.png) no-repeat 0 center; color:#626262; padding:0 0 0 24px;}
+.login_yzm{background:url(../img/yzm_01.png) no-repeat 0 0; width:104px; height:30px; border:0 none; font-size:12px !important; color:#FFF; cursor:pointer; font-family:"Microsoft YaHei";}
+.login_li2{padding:0 0 0 68px;}
+.login_line{height:4px; line-height:0; font-size:0; overflow:hidden; display:block;}
+.login_qd1{background:#ffc174; width:68px;}
+.login_qd2{background:#fa9f31; width:136px;}
+.login_qd3{background:#f27902; width:206px;}
+
+.login_font{height:30px; text-align:center; clear:both;}
+.login_font span{float:left; height:30px; text-align:center; width:69px;}
+.login_font span.login_c1{color:#ffc174;}
+.login_font span.login_c2{color:#fa9f31;}
+.login_font span.login_c3{color:#f27902;}
+
+.login_submit{width:400px; height:56px; line-height:56px; text-align:center; font-size:24px; color:#FFF!important; display:block;}
+.login_submit:hover{text-decoration:none;}
+
+.login_forget{float:right; margin-right: 87px;}
+
+.pub_abso{vertical-align:middle;}

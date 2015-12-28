@@ -1,0 +1,28 @@
+.indexBody{width: 100%;margin:75px auto 0 auto;}
+
+.search{min-height: 460px;padding: 25px 25px;background: url("../img/activity.jpg");
+filter:"progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod='scale')";  
+-moz-background-size:100% ;  
+    background-size:100% ; }
+.search .dialog{margin: 0 auto; background: rgba(0,0,0,0.72);width:1176px;min-height: 413px;padding: 28px 25px 25px 25px;-webkit-border-radius: .35294118em;-moz-border-radius: .35294118em;-o-border-radius: .35294118em;border-radius: .35294118em;box-shadow: 0 0 15px 0 rgba(0,0,0,0.5);-webkit-box-shadow: 0 0 15px 0 rgba(0,0,0,0.5);}
+.search .dialog h1{color: white;padding-left:32px;margin-bottom: 30px; font-size: 28px;}
+.search .dialog .formConta{ min-height: 300px;padding: 25px;}
+.search .dialog .formConta .des{height: 72px;}
+.search .dialog .formConta .lab{color: #c7c7c7;font-weight: bold;font-size: .76470588em;line-height: 1.4; margin-bottom: .46153846em;}
+.search .dialog .formConta .des input{padding:10px 15px 10px 32px;box-shadow: inset 0 .06666667em 0 rgba(0,0,0,.1),inset 0 .06666667em .06666667em rgba(0,0,0,.05);border-radius: .2em;border: 1px solid transparent; border-color: #858585 #c2c2c2 #c2c2c2;background: #fff;cursor: text;color: #1f1f1f;}
+.search .dialog .formConta .datebox{padding:8px 15px 8px 32px;box-shadow: inset 0 .06666667em 0 rgba(0,0,0,.1),inset 0 .06666667em .06666667em rgba(0,0,0,.05);border-radius: .2em;border: 1px solid transparent; border-color: #858585 #c2c2c2 #c2c2c2;background: #fff;cursor: text;color: #1f1f1f;}
+.search .dialog .formConta .icon{color: #0065b8;outline: 0;-webkit-appearance: none;-o-appearance: none;-moz-appearance: none;appearance: none;box-shadow: 0 0 0 .13333333em #00355f;border-color: #00355f;position: absolute;display: block;width: 1.76470588em;height: 2.11764706em;margin-top: -2.11764706em;box-shadow: none!important;padding: 0;line-height: 2.11764706em;text-align: center;color: #c7c7c7;}
+.search .dialog .formConta .ci{clear: both;float:left;width: 205px;height: 60px;margin-top: .70588235em;color: #3d3d3d;}
+.search .dialog .formConta .co{margin-left: 25px;float:left;width: 205px;height: 60px;margin-top: .70588235em;color: #3d3d3d;}
+.search .dialog .formConta .des input{width: 640px;}
+.search .dialog .formConta .sell{float:left;height: 72px;padding-top:.70588235em;margin-right: 35px;}
+.search .dialog .formConta .sell select{border-color: #f5f5f5;padding: 10px;height: 38px;border-radius: .2em;padding-top: .4em;padding-bottom: .4em}
+.search .dialog .formConta .sell1{float:left;height: 72px;padding-top:.70588235em;margin-right: 57px;}
+.search .dialog .formConta .sell1 select{border-color: #f5f5f5;padding: 10px;height: 38px;border-radius: .2em;padding-top: .4em;padding-bottom: .4em}
+.search .dialog .formConta .selltil{color: #ccc;line-height: 70px;margin-right: 20px;}
+
+.selRoo{margin-top: 20px;float: left;clear: both;}
+.selRooMore{ float: left;clear: both; }
+
+.search .dialog .formConta .btn{padding-left: 0; margin-top: .70588235em;color: #3d3d3d; margin-right: .70588235em;}
+.search .dialog .formConta .btn button{width:72px;height:48px;border-color: #d4a900 #aa8700 #aa8700;background: #ffbe00;background: linear-gradient(bottom,#ffbe00 0,#ffcb00 100%);color: #3d3100;margin: 1.41176471em 1.41176471em 0 0;border: 1px solid transparent;border-width: 1px 1px 2px;border-radius: .23529412em;padding: 0;font-size: 17px;line-height: 1.45;font-weight: 700;cursor: pointer;}

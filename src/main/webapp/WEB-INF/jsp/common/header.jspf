@@ -1,0 +1,37 @@
+<%@ page language="java"
+import="com.qinjiance.tourist.util.CookieUtil"
+contentType="text/html; charset=utf-8"
+	pageEncoding="utf-8"%>
+<div class="header1 newpage">
+	<!--setthick-->
+	<div class="bars">
+		<div class="name"><a href="${ctx}/"><em class="navi-logo"></em><fmt:message key="webapp.title" /><b>(服务热线: 800-xxx-xxxx)</b></a></div>
+		<div class="btns">
+			<a class="${navi==0?'select':''}" href="${ctx}/">酒店</a>
+			<a class="${navi==1?'select':''}" href="${ctx}/car">租车</a>
+			<a class="${navi==2?'select':''}" href="${ctx}/activity">当地玩乐</a>
+			<div class="btnbar"></div>
+		</div>
+		<div class="loginpart">
+		<% Long userId = CookieUtil.getUserIdFromCookie();
+			if(userId==null){ %>
+			<div id="unlogonTop" class="unlogin">
+				<a href="${ctx}/loginPage">登录</a>|<a href="${ctx}/regPage">注册</a>
+			</div>
+		<%	} else { 
+				String nickname = CookieUtil.getNicknameFromCookie();%>
+			<div class="carts"><a href="${ctx}/user/order">我的订单(0)</a></div>
+			<div id="logonTop" class="logined">
+				<div class="user">
+					<a id="nicknameTop" class="blue" href="${ctx}/user/userInfo"><%=nickname%><em></em></a>
+				</div>
+				<div class="selection">
+					<span><a href="${ctx}/user/userInfo">账号信息</a></span> <span><a
+						href="${ctx}/user/chPwd">修改密码</a></span> <span><a
+						href="${ctx}/logout">退出</a></span>
+				</div>
+			</div>
+		<%	} %>
+		</div>
+	</div>
+</div>

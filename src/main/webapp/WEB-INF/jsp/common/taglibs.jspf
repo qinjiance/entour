@@ -1,0 +1,11 @@
+<%@page pageEncoding="utf-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%
+	String serverContextPath = request.getContextPath();
+	String serverRoot = request.getScheme() + "://" + request.getServerName()
+			+ (request.getServerPort() == 80 ? "" : (":" + request.getServerPort())) + request.getContextPath();
+%>
+<c:set var="ctx" value="<%=serverContextPath%>"></c:set>
+<c:set var="srt" value="<%=serverRoot%>"></c:set>

@@ -1,0 +1,14 @@
+.chPwd_li{height:41px; line-height:30px;}
+.chPwd_li a{color:#F27902}
+.chPwd_li2{padding:0 0 0 68px;}
+.chPwd_mx{background:url(../img/ma_01.png) no-repeat 0 0; height:40px;}
+.chPwd_line{height:4px; line-height:0; font-size:0; overflow:hidden; display:block;}
+.chPwd_qd1{background:#ffc174; width:68px;}
+.chPwd_qd2{background:#fa9f31; width:136px;}
+.chPwd_qd3{background:#f27902; width:206px;}
+
+.chPwd_font{height:30px; text-align:center; clear:both;}
+.chPwd_font span{float:left; height:30px; text-align:center; width:69px;}
+.chPwd_font span.chPwd_c1{color:#ffc174;}
+.chPwd_font span.chPwd_c2{color:#fa9f31;}
+.chPwd_font span.chPwd_c3{color:#f27902;}

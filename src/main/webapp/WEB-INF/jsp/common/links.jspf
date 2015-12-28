@@ -1,0 +1,14 @@
+<%@ page language="java" contentType="text/html; charset=utf-8"
+	pageEncoding="utf-8"%>
+<link rel="stylesheet" type="text/css"
+	href="${ctx}<fmt:message key="static.resources.host"/>/js/easyui/themes/default/easyui.css" />
+<link rel="stylesheet" type="text/css"
+	href="${ctx}<fmt:message key="static.resources.host"/>/js/easyui/themes/icon.css" />
+<link rel="stylesheet" type="text/css"
+	href="${ctx}<fmt:message key="static.resources.host"/>/css/jquery.autocomplete.css" />
+<link rel="shortcut icon" type="image/x-icon"
+	href="${ctx}<fmt:message key="static.resources.host"/>/img/favicon.ico" />
+<link rel="Bookmark"
+	href="${ctx}<fmt:message key="static.resources.host"/>/img/favicon.ico" />
+<link rel="stylesheet" type="text/css"
+	href="${ctx}<fmt:message key="static.resources.host"/>/css/main.css" />

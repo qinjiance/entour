@@ -1,0 +1,33 @@
+label{vertical-align:middle; font-family:tahoma; font-family:"Microsoft YaHei";}
+#regLogo img{width: 460px; height: 459px; margin: 40px 10px;}
+#reg{width:500px; height:459px; position:relative; overflow:hidden; margin: 40px 10px;}
+.reg_from{background:#f3f3f3; height:403px; padding:0 0 0 42px;}
+.reg_title{font-size:24px; color:#626262; padding-top:10px; height:45px;padding-bottom:20px;}
+.reg_btn{height:56px; background:url(../img/submit_01.png) no-repeat center top;display:block;_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../img/client/regbtn_bg8.png', sizingMethod='scale');}
+.reg_li{height:41px; line-height:30px;}
+.reg_li a{color:#F27902}
+.reg_nm{font-size:14px; color:#848484; padding-right:12px;}
+.reg_input{width:198px; height:18px; line-height:18px; border:1px solid #d7d7d7; background:#FFF; color:#666; padding:5px 3px; font-size:14px;}
+.reg_width{width:82px;}
+.reg_ps{padding:0 0 0 8px; color:#626262; }
+.reg_ps span{font-size:12px;}
+.reg_err{background:url(../img/err_01.png) no-repeat 0 center; color:#626262; padding:0 0 0 24px;}
+.reg_ok{background:url(../img/ok_01.png) no-repeat 0 center; color:#626262; padding:0 0 0 24px;}
+.reg_yzm{background:url(../img/yzm_01.png) no-repeat 0 0; width:104px; height:30px; border:0 none; font-size:12px !important; color:#FFF; cursor:pointer; font-family:"Microsoft YaHei";}
+.reg_li2{padding:0 0 0 68px;}
+.reg_mx{background:url(../img/ma_01.png) no-repeat 0 0; height:40px;}
+.reg_line{height:4px; line-height:0; font-size:0; overflow:hidden; display:block;}
+.reg_qd1{background:#ffc174; width:68px;}
+.reg_qd2{background:#fa9f31; width:136px;}
+.reg_qd3{background:#f27902; width:206px;}
+
+.reg_font{height:30px; text-align:center; clear:both;}
+.reg_font span{float:left; height:30px; text-align:center; width:69px;}
+.reg_font span.reg_c1{color:#ffc174;}
+.reg_font span.reg_c2{color:#fa9f31;}
+.reg_font span.reg_c3{color:#f27902;}
+
+.reg_submit{width:500px; height:56px; line-height:56px; text-align:center; font-size:24px; color:#FFF!important; display:block;}
+.reg_submit:hover{text-decoration:none;}
+
+.pub_abso{vertical-align:middle;}

@@ -1,0 +1,20 @@
+.ui-datepicker{border:1px solid rgb(149,184,213);width:300px;overflow:hidden;background-color:#fff;margin:4px 0 8px;box-shadow:0 0 1px rgba(0,0,0,0.1);font-family:Arial;padding-bottom:20px;}
+.ui-datepicker .ui-datepicker-header{border-bottom:1px solid rgb(149,184,213);background-color:rgb(227,238,255);padding-top:10px;}
+.ui-datepicker .ui-datepicker-header .ui-datepicker-prev{position:absolute;left:25px;top:25px;}
+.ui-datepicker .ui-datepicker-header .ui-datepicker-next{position:absolute;right:25px;top:25px;}
+.ui-datepicker .ui-datepicker-header .ui-datepicker-prev span,.ui-datepicker .ui-datepicker-header .ui-datepicker-next span{background:url(../img/calendar.jpg) no-repeat;text-indent:-999px;display:inline-block;width:10px;height:12px;*float:left;}
+.ui-datepicker .ui-datepicker-header .ui-datepicker-prev span{background-position:0 0;}
+.ui-datepicker .ui-datepicker-header .ui-datepicker-next span{background-position:-25px 0;}
+.ui-datepicker .ui-datepicker-header .ui-datepicker-title{padding:10px 0;text-align:center;}
+.ui-datepicker .ui-datepicker-header .ui-datepicker-title select{width:80px;font-size:15px;color:rgb(0,136,204);}
+.ui-datepicker .ui-datepicker-header .ui-datepicker-title .ui-datepicker-month{margin-right:10px;}
+.ui-datepicker .ui-datepicker-calendar{font-size:12px;margin:0 15px;width:270px;}
+.ui-datepicker .ui-datepicker-calendar th{color:#a8a8a8;height:40px;}
+.ui-datepicker .ui-datepicker-calendar td{height:25px;text-align:center;vertical-align:middle;}
+.ui-datepicker .ui-datepicker-calendar td>a{width:25px;padding:5px 0;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius:5px;}
+.ui-datepicker .ui-datepicker-calendar .ui-state-default{color:#565656;}
+.ui-datepicker .ui-datepicker-calendar .ui-state-hover{background-color:#c9c9c9;color:rgb(0,136,204);}
+.ui-datepicker .ui-datepicker-calendar .ui-state-highlight{background-color:rgb(0,136,204);color:#fff;}
+#ui-datepicker-div{ position:absolute;top:-100px;} 
+.ui-datepicker .ui-datepicker-calendar .ui-state-hover.spday{background-color:#fff;color:#c9c9c9;}
+.ui-datepicker .ui-datepicker-calendar .ui-state-default.spday{color:#c9c9c9;}

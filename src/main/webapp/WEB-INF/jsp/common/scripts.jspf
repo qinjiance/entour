@@ -1,0 +1,51 @@
+<%@ page language="java" contentType="text/html; charset=utf-8"
+	pageEncoding="utf-8"%>
+<script type="text/javascript"
+	src="${ctx}<fmt:message key="static.resources.host"/>/js/jquery-1.11.1.min.js"></script>
+<script type="text/javascript"
+	src="${ctx}<fmt:message key="static.resources.host"/>/js/easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript"
+	src="${ctx}<fmt:message key="static.resources.host"/>/js/easyui/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript"
+	src="${ctx}<fmt:message key="static.resources.host"/>/js/jquery.autocomplete.min.js"></script>
+<script type="text/javascript"
+	src="${ctx}<fmt:message key="static.resources.host"/>/js/jquery.tinytimer.min.js"></script>
+<script type="text/javascript"
+	src="${ctx}<fmt:message key="static.resources.host"/>/js/jquery-migrate-1.2.1.min.js"></script>
+<script type="text/javascript"
+	src="${ctx}<fmt:message key="static.resources.host"/>/js/jquery.yx_rotaion.js"></script>
+<script type="text/javascript"
+	src="${ctx}<fmt:message key="static.resources.host"/>/js/main.js"></script>
+<script type="text/javascript">
+	$(document).ready(function(e) {
+		$(".btns a").hover(function() {
+			var mywidth = $(this).width();
+			var myleft = $(this).position().left;
+			$(".btns .btnbar").css({
+				"width" : mywidth + "px",
+				"left" : myleft + "px"
+			});
+		}, function() {
+			var selectItem = $(".btns a.select");
+			if(selectItem && selectItem.length>0){
+				var mywidth = selectItem.width();
+				var myleft = selectItem.position().left;
+			}else{
+				var mywidth = 0;
+				var myleft = 0;
+			}
+			$(".btns .btnbar").css({
+				"width" : mywidth + "px",
+				"left" : myleft + "px"
+			});
+		});
+		$(window).scroll(function(){
+			if($(window).scrollTop()>70){
+				$(".header1").addClass("setthick");
+				}
+			else{
+				$(".header1").removeClass("setthick");
+			}
+		})
+	});
+</script>

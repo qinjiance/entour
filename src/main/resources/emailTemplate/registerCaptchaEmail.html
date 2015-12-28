@@ -1,0 +1,24 @@
+<html>
+<head>
+<title>${webappTitle}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+<body bgcolor="#FFFFFF" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<table width="680" border="0" align="center" cellpadding="0" cellspacing="0">
+	<tr>
+		<td style="border-bottom:2px solid #BBB;"><img src="logo.png" alt="logo" style="display:block; border:none 0;float:left;" />
+			<b style="line-height:50px;font-size:26px;vertical-align:middle;font-family:Verdana,'宋体';">
+				<a style="text-decoration: none;" href="${homeUrl}">${webappTitle}</a>
+			</b>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<p>尊敬的用户${email}，感谢您使用${webappTitle}网</p>
+			<p>您本次的验证码为：${captcha}，有效时间${expire}分钟</p>
+			<p>请尽快填写验证码</p>
+		</td>
+	</tr>
+</table>
+</body>
+</html>

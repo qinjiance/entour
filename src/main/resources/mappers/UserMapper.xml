@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qinjiance.tourist.mapper.UserMapper">
+    <insert id="insert" parameterType="user">
+        INSERT INTO 
+    		user (nickname, email, mobile, level, salt, password, register_ip, register_time, update_time) 
+    	VALUES 
+    		(#{nickname}, #{email}, #{mobile}, #{level}, #{salt}, #{password}, INET_ATON(#{registerIp}), now(), now())
+    </insert>
+</mapper>

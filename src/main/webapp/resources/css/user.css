@@ -1,0 +1,14 @@
+.rightD{padding:10px;}
+.rightD .title{margin:20px;text-align:center;color:#F7AD50;font-size: 28px;}
+.rightD .content p{margin:5px;}
+.rightD .content p.header{padding-bottom:10px;font-size: 16px;color:#000;font-weight: bold;border-bottom: #ccc dotted 1px;}
+.rightD .content p.item{font-size: 13px;}
+.rightD .content p span{display: inline-block;}
+.rightD .content p.header span.name{width:360px;}
+.rightD .content p.header span.time{width:170px;}
+.rightD .content p.header span.op{width:110px;}
+.rightD .content p.header span.de{width:50px;}
+.rightD .content p.item span.name{width:360px;}
+.rightD .content p.item span.time{width:170px;}
+.rightD .content p.item span.op{width:115px;}
+.rightD .content p.item span.de{width:60px;}

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>\(%d{HH:mm:ss.SSS} [%thread]\) %-5level %logger{32} %L - %msg%n</pattern>
+		</encoder>
+	</appender>
+	<root>
+		<level value="INFO" />
+		<appender-ref ref="STDOUT" />
+	</root>
+	<logger name="com.qinjiance.tourist.manager.impl.EhCacheManager"
+		level="DEBUG" additivity="true">
+	</logger>
+	<logger name="org.mybatis.spring" level="TRACE" additivity="true">
+	</logger>
+	<logger name="org.springframework.transaction" level="DEBUG"
+		additivity="true">
+	</logger>
+	<logger name="com.qinjiance.tourist.mapper" level="TRACE"
+		additivity="true">
+	</logger>
+	<logger
+		name="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+		level="DEBUG" additivity="true">
+	</logger>
+</configuration>
