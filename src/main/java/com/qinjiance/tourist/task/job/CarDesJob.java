@@ -10,7 +10,6 @@ import java.io.OutputStream;
 import java.util.Date;
 
 import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,13 +29,81 @@ public class CarDesJob {
 
 	private static FTPClient ftpClient = new FTPClient();
 
-	public static final String localPath = null;
-	public static final String ftpHost = null;
-	public static final Integer ftpPort = null;
-	public static final String ftpPath = null;
-	public static final String ftpFilename = null;
-	public static final String ftpUsername = null;
-	public static final String ftpPassword = null;
+	public String localPath = null;
+	public String ftpHost = null;
+	public Integer ftpPort = null;
+	public String ftpPath = null;
+	public String ftpFilename = null;
+	public String ftpUsername = null;
+	public String ftpPassword = null;
+
+	public static FTPClient getFtpClient() {
+		return ftpClient;
+	}
+
+	public static void setFtpClient(FTPClient ftpClient) {
+		CarDesJob.ftpClient = ftpClient;
+	}
+
+	public String getLocalPath() {
+		return localPath;
+	}
+
+	public void setLocalPath(String localPath) {
+		this.localPath = localPath;
+	}
+
+	public String getFtpHost() {
+		return ftpHost;
+	}
+
+	public void setFtpHost(String ftpHost) {
+		this.ftpHost = ftpHost;
+	}
+
+	public Integer getFtpPort() {
+		return ftpPort;
+	}
+
+	public void setFtpPort(Integer ftpPort) {
+		this.ftpPort = ftpPort;
+	}
+
+	public String getFtpPath() {
+		return ftpPath;
+	}
+
+	public void setFtpPath(String ftpPath) {
+		this.ftpPath = ftpPath;
+	}
+
+	public String getFtpFilename() {
+		return ftpFilename;
+	}
+
+	public void setFtpFilename(String ftpFilename) {
+		this.ftpFilename = ftpFilename;
+	}
+
+	public String getFtpUsername() {
+		return ftpUsername;
+	}
+
+	public void setFtpUsername(String ftpUsername) {
+		this.ftpUsername = ftpUsername;
+	}
+
+	public String getFtpPassword() {
+		return ftpPassword;
+	}
+
+	public void setFtpPassword(String ftpPassword) {
+		this.ftpPassword = ftpPassword;
+	}
+
+	public static Logger getLogger() {
+		return logger;
+	}
 
 	/**
 	 * 
@@ -94,11 +161,13 @@ public class CarDesJob {
 
 			ftpClient.connect(host, port);
 			// 如果采用默认端口，可以使用ftp.connect(url)的方式直接连接FTP服务器
-			ftpClient.login(username, password);// 登录
+			boolean loginRet = ftpClient.login(username, password);// 登录
+			logger.info("loginRet = " + loginRet);
 			// 设置文件传输类型为二进制
 			ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
 			// 获取ftp登录应答代码
 			reply = ftpClient.getReplyCode();
+			logger.info("reply = " + reply);
 			// 验证是否登陆成功
 			if (!FTPReply.isPositiveCompletion(reply)) {
 				ftpClient.disconnect();
@@ -106,17 +175,32 @@ public class CarDesJob {
 				return result;
 			}
 			// 转移到FTP服务器目录至指定的目录下
-			ftpClient.changeWorkingDirectory(new String(remotePath.getBytes("UTF-8"), "iso-8859-1"));
+			boolean changeRet = ftpClient
+					.changeWorkingDirectory(new String(remotePath.getBytes("UTF-8"), "iso-8859-1"));
+			logger.info("changeRet to " + new String(remotePath.getBytes("UTF-8"), "iso-8859-1") + " = " + changeRet);
 			// 获取文件列表
-			FTPFile[] fs = ftpClient.listFiles();
-			for (FTPFile ff : fs) {
-				if (ff.getName().equals(fileName)) {
-					result = new File(localPath);
-					os = new FileOutputStream(result);
-					ftpClient.retrieveFile(ff.getName(), os);
-					os.close();
-				}
+			// String[] names = ftpClient.listNames();
+			// logger.info("Names[] = " +
+			// (names==null?"null":Arrays.toString(names)));
+			// FTPFile[] fs = ftpClient.listFiles();
+			// logger.info("FTPFile[] = " + (fs==null?"null":fs.length));
+			// for (FTPFile ff : fs) {
+			// logger.info(ff.getName());
+			// if (ff.getName().equals(fileName)) {
+			File dir = new File(localPath);
+			if (!dir.exists()) {
+				logger.info("result.mkdirs() = " + dir.mkdirs());
 			}
+			result = new File(localPath + fileName);
+			if (!result.exists()) {
+				logger.info("result.createNewFile() = " + result.createNewFile());
+			}
+			os = new FileOutputStream(result);
+			boolean retrTet = ftpClient.retrieveFile(fileName, os);
+			logger.info("retrieveFileRet = " + retrTet);
+			os.close();
+			// }
+			// }
 			ftpClient.logout();
 			return result;
 		} catch (Exception e) {
@@ -136,7 +220,7 @@ public class CarDesJob {
 		return result;
 	}
 
-	public static String getFilePath() {
+	public String getFilePath() {
 		String filepath = localPath + "carDes";
 		String filename = DateUtils.formatAsString(new Date(), "yyyyMMddHHmmss");
 		return filepath + filename + ".zip";

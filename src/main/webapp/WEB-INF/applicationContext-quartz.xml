@@ -5,7 +5,7 @@
             http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
 	<!-- 要调用的工作类 -->
-	<bean id="carDesJob" class="com.kay.quartz.QuartzJob">
+	<bean id="carDesJob" class="com.qinjiance.tourist.task.job.CarDesJob">
 		<property name="localPath" value="${quartz.cron.carDesJob.localPath}" />
 		<property name="ftpHost" value="${quartz.cron.carDesJob.ftpHost}" />
 		<property name="ftpPort" value="${quartz.cron.carDesJob.ftpPort}" />
@@ -19,7 +19,7 @@
 		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
 		<!-- 调用的类 -->
 		<property name="targetObject">
-			<ref bean="carDesTask" />
+			<ref bean="carDesJob" />
 		</property>
 		<!-- 调用类中的方法 -->
 		<property name="targetMethod">

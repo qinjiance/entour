@@ -159,6 +159,11 @@
 			<artifactId>jackson-mapper-lgpl</artifactId>
 			<version>${jackson}</version>
 		</dependency>
+        <dependency>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz</artifactId>
+            <version>1.8.5</version>
+        </dependency> 
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-xc</artifactId>
