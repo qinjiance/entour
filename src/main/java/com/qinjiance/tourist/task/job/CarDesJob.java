@@ -7,9 +7,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Date;
 
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -179,28 +181,27 @@ public class CarDesJob {
 					.changeWorkingDirectory(new String(remotePath.getBytes("UTF-8"), "iso-8859-1"));
 			logger.info("changeRet to " + new String(remotePath.getBytes("UTF-8"), "iso-8859-1") + " = " + changeRet);
 			// 获取文件列表
-			// String[] names = ftpClient.listNames();
-			// logger.info("Names[] = " +
-			// (names==null?"null":Arrays.toString(names)));
-			// FTPFile[] fs = ftpClient.listFiles();
-			// logger.info("FTPFile[] = " + (fs==null?"null":fs.length));
-			// for (FTPFile ff : fs) {
-			// logger.info(ff.getName());
-			// if (ff.getName().equals(fileName)) {
-			File dir = new File(localPath);
-			if (!dir.exists()) {
-				logger.info("result.mkdirs() = " + dir.mkdirs());
+			String[] names = ftpClient.listNames();
+			logger.info("Names[] = " + (names == null ? "null" : Arrays.toString(names)));
+			FTPFile[] fs = ftpClient.listFiles();
+			logger.info("FTPFile[] = " + (fs == null ? "null" : fs.length));
+			for (FTPFile ff : fs) {
+				logger.info(ff.getName());
+				if (ff.getName().equals(fileName)) {
+					File dir = new File(localPath);
+					if (!dir.exists()) {
+						logger.info("result.mkdirs() = " + dir.mkdirs());
+					}
+					result = new File(localPath + fileName);
+					if (!result.exists()) {
+						logger.info("result.createNewFile() = " + result.createNewFile());
+					}
+					os = new FileOutputStream(result);
+					boolean retrTet = ftpClient.retrieveFile(fileName, os);
+					logger.info("fileName = " + fileName + ", retrieveFileRet = " + retrTet);
+					os.close();
+				}
 			}
-			result = new File(localPath + fileName);
-			if (!result.exists()) {
-				logger.info("result.createNewFile() = " + result.createNewFile());
-			}
-			os = new FileOutputStream(result);
-			boolean retrTet = ftpClient.retrieveFile(fileName, os);
-			logger.info("retrieveFileRet = " + retrTet);
-			os.close();
-			// }
-			// }
 			ftpClient.logout();
 			return result;
 		} catch (Exception e) {
