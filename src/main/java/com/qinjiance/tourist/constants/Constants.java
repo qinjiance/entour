@@ -1,7 +1,7 @@
 package com.qinjiance.tourist.constants;
 
 /**
- * @author "Jiance Qin", tianbenzhen@pwrd.com
+ * @author "Jiance Qin"
  * 
  * @date 2014年7月5日
  * 

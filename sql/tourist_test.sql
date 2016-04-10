@@ -404,7 +404,6 @@ CREATE TABLE `user` (
 -- ----------------------------
 INSERT INTO `user` VALUES ('1', 'qinjiance', 'iL9uScZUjsOhqoCU6ZEBPXwpCo00Mfr7/RfzqkpIH48=', 'ed85bc605755422c8ede3b7657e11d36', '100', 'qinjiance@126.com', '18810546883', '0', '2014-07-21 22:43:55', '2014-07-26 00:39:40');
 INSERT INTO `user` VALUES ('3', '182870682', 'uJRZeiZ8r1+RzaXARXmAOaolj0Y3C5ojVJX8ojbdFr0=', '47b31302a0774004a787cbdb8d1d3438', '0', '182870682@qq.com', '18810546883', '2130706433', '2014-07-24 02:00:32', '2014-07-24 02:00:32');
-INSERT INTO `user` VALUES ('4', 'qinjiance2', 'rexXwfr/xzNG8MOpJybSowp9o2I+4LrdrMlkcKroWBg=', '0d92039ccb524600bafa71d16f5c272f', '0', 'qinjiance@pwrd.com', '18810546883', '3550323713', '2014-07-31 18:07:46', '2014-07-31 18:07:46');
 INSERT INTO `user` VALUES ('5', 'highmesh', 'NSfVySB2JHVL+3O/Laeuh06qUYEJV6z1vu938XQLPNI=', '16028003a1084a4ebcc22b5776647bb6', '0', 'highmesh@163.com', '18910152500', '3025084867', '2014-07-31 18:08:17', '2014-07-31 18:08:17');
 
 -- ----------------------------
