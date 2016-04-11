@@ -25,11 +25,11 @@ import com.qinjiance.tourist.manager.exception.ManagerException;
 import com.qinjiance.tourist.manager.impl.EhCacheManager.CacheType;
 import com.qinjiance.tourist.mapper.FavoriteRouteMapper;
 import com.qinjiance.tourist.mapper.ShoppingCartMapper;
-import com.qinjiance.tourist.mapper.TourRouteMapper;
+import com.qinjiance.tourist.mapper.BillingHotelMapper;
 import com.qinjiance.tourist.mapper.UserMapper;
 import com.qinjiance.tourist.model.po.FavoriteRoute;
 import com.qinjiance.tourist.model.po.ShoppingCart;
-import com.qinjiance.tourist.model.po.TourRoute;
+import com.qinjiance.tourist.model.po.BillingHotel;
 import com.qinjiance.tourist.model.po.User;
 import com.qinjiance.tourist.model.vo.RegisterForm;
 import com.qinjiance.tourist.util.CheckStyleUtil;
@@ -62,7 +62,7 @@ public class UserManager implements IUserManager {
 	@Autowired
 	private IEmailManager emailManager;
 	@Autowired
-	private TourRouteMapper tourRouteMapper;
+	private BillingHotelMapper tourRouteMapper;
 
 	/*
 	 * (non-Javadoc)
@@ -582,7 +582,7 @@ public class UserManager implements IUserManager {
 		if (userId == null) {
 			throw new ManagerException("请先登录");
 		}
-		TourRoute tourRoute = tourRouteMapper.getById(routeId);
+		BillingHotel tourRoute = tourRouteMapper.getById(routeId);
 		if (tourRoute == null) {
 			throw new ManagerException("该路线已结束");
 		}
@@ -626,7 +626,7 @@ public class UserManager implements IUserManager {
 		if (userId == null) {
 			throw new ManagerException("请先登录");
 		}
-		TourRoute tourRoute = tourRouteMapper.getById(routeId);
+		BillingHotel tourRoute = tourRouteMapper.getById(routeId);
 		if (tourRoute == null) {
 			throw new ManagerException("该路线已结束");
 		}
