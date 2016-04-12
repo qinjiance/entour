@@ -15,6 +15,8 @@ public class BillingHotel extends BaseObject {
 	private static final long serialVersionUID = -7081816808907682529L;
 
 	private Long id;
+	private String username;
+	private Long userId;
 	private Long transactionNum;
 	private Long reservationId;
 	private String hotelCountry;
@@ -45,6 +47,36 @@ public class BillingHotel extends BaseObject {
 	private Date createTime;
 	private Date payTime;
 	private Date chargeTime;
+
+	/**
+	 * @return the username
+	 */
+	public String getUsername() {
+		return username;
+	}
+
+	/**
+	 * @param username
+	 *            the username to set
+	 */
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	/**
+	 * @return the userId
+	 */
+	public Long getUserId() {
+		return userId;
+	}
+
+	/**
+	 * @param userId
+	 *            the userId to set
+	 */
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
 
 	/**
 	 * @return the id

@@ -142,46 +142,4 @@ public interface IUserManager {
 	 * @return
 	 */
 	public boolean updateCurrentPassword(String password, String newPassword) throws ManagerException;
-
-	/**
-	 * @return
-	 */
-	public List<ShoppingCart> getCurrentShoppingCart() throws ManagerException;
-
-	/**
-	 * @return
-	 */
-	public List<FavoriteRoute> getCurrentFavoRoute() throws ManagerException;
-
-	/**
-	 * @param cartId
-	 * @return
-	 */
-	public boolean deleteCurrentShoppingCart(Long cartId) throws ManagerException;
-
-	/**
-	 * @param favoId
-	 * @return
-	 */
-	public boolean deleteCurrentFavoriteRoute(Long favoId) throws ManagerException;
-
-	/**
-	 * @param routeId
-	 * @return
-	 */
-	public boolean addCurrentFavoRoute(Long routeId) throws ManagerException;
-
-	/**
-	 * @return
-	 */
-	public Integer getCurrentShoppingCartCount();
-
-	/**
-	 * @param routeId
-	 * @param personNumber
-	 * @param departureDate
-	 * @return
-	 */
-	public boolean addCurrentShoppingCart(Long routeId, Long personNumber, String departureDate)
-			throws ManagerException;
 }

@@ -33,6 +33,4 @@ public interface BillingHotelMapper {
 
 	@Select("select * from billing_hotel where id = #{id}")
 	public BillingHotel getById(@Param("id") Long id);
-
-	public PageList<BillingHotel> getByConditions(Map<String, Object> conditions, PageBounds pageBounds);
 }

@@ -4,10 +4,12 @@
 package com.qinjiance.tourist.manager;
 
 import java.util.Date;
+import java.util.List;
 
 import com.qinjiance.tourist.manager.exception.ManagerException;
 import com.qinjiance.tourist.model.vo.HoltelDetPrice;
 import com.qinjiance.tourist.model.vo.HoltelDetVo;
+import com.qinjiance.tourist.model.vo.HotelBookRoomInfo;
 import com.qinjiance.tourist.model.vo.SearchHotelResult;
 
 /**
@@ -26,10 +28,11 @@ public interface IHotelManager {
 			Integer searchStars, Integer searchPrices, String searchHotelCat) throws ManagerException;
 
 	HoltelDetVo getHotelDetail(Integer hotelId, Date checkIn, Date checkOut, String roomInfo) throws ManagerException;
-	
-	HoltelDetPrice checkAvailabilityAndPrice(Integer hotelId, Date checkIn, Date checkOut, String roomInfo,Integer hotelRoomTypeId) throws ManagerException;
-	
-	boolean checkAvailability(Integer hotelId, Date checkIn, Date checkOut, String roomInfo,
-			Integer HotelRoomTypeId,Integer boardbaseId,String boardbasePrice,
-			String suppJsonString,String bedding,String totalPrice)throws ManagerException;
+
+	HoltelDetPrice checkAvailabilityAndPrice(Integer hotelId, Date checkIn, Date checkOut, String roomInfo,
+			Integer hotelRoomTypeId) throws ManagerException;
+
+	String prePay(Long orderId, Integer hotelId, Date checkIn, Date checkOut, List<HotelBookRoomInfo> bookRoomInfo,
+			String roomInfo, Integer hotelRoomTypeId, String confirmEmail, Integer payTypeId, Long totalDaofu,
+			Long totalYufu) throws ManagerException;
 }

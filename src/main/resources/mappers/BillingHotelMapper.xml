@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qinjiance.tourist.mapper.BillingHotelMapper">
+	<insert id="insert" parameterType="billingHotel">
+		INSERT INTO
+		billing_hotel
+		(id, username, user_id, transaction_num, reservation_id, hotel_country, hotel_city, hotel_id, hotel_name, 
+		hotel_address, room_type_id, room_type, room_num ,check_in, check_out, room_infos
+		price, price_atproperty, payment_type, pay_type, contact_info, delta_price, currency,
+		is_only_available, confirmation_email, confirmation_logo, pay_status, gateway_order_id, pay_failed_info, charge_status,
+		charge_failed_info, create_time, pay_time, charge_time)
+		VALUES
+		(#{id}, #{username}, #{userId}, #{transactionNum}, #{reservationId}, #{hotelCountry}, #{hotelCity}, #{hotelId}, #{hotelName}, 
+		#{hotelAddress}, #{roomTypeId}, #{roomType}, #{roomNum}, #{checkIn}, #{checkOut}, #{room_infos},
+		#{price}, #{priceAtproperty}, #{paymentType}, #{payType}, #{contactInfo}, #{deltaPrice}, #{currency},
+		#{isOnlyAvailable}, #{confirmationEmail}, #{confirmationLogo}, #{payStatus}, #{gatewayOrderId}, #{payFailedInfo}, #{chargeStatus},
+		#{chargeFailedInfo}, now(), #{payTime}, #{chargeTime})
+	</insert>
+</mapper>
