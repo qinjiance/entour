@@ -21,21 +21,26 @@ public class BillingHotel extends BaseObject {
 	private Long reservationId;
 	private String hotelCountry;
 	private String hotelCity;
-	private Long hotelId;
+	private Integer hotelId;
 	private String hotelName;
 	private String hotelAddress;
-	private Long roomTypeId;
+	private Integer roomTypeId;
 	private String roomType;
-	private Integer roomNum;
+	private String roomNum;
+	private Date checkIn;
+	private Date checkOut;
 	private String roomInfos;
+	private Long payPrice;
 	private Long price;
+	private Long payPriceAtproperty;
 	private Long priceAtproperty;
 	private String paymentType;
-	private Integer payTypId;
 	private String payType;
 	private String contactInfo;
 	private Integer deltaPrice;
 	private String currency;
+	private String payCurrency;
+	private Double exchange;
 	private Boolean isOnlyAvailable;
 	private String confirmationEmail;
 	private String confirmationLogo;
@@ -47,6 +52,96 @@ public class BillingHotel extends BaseObject {
 	private Date createTime;
 	private Date payTime;
 	private Date chargeTime;
+
+	/**
+	 * @return the checkIn
+	 */
+	public Date getCheckIn() {
+		return checkIn;
+	}
+
+	/**
+	 * @param checkIn
+	 *            the checkIn to set
+	 */
+	public void setCheckIn(Date checkIn) {
+		this.checkIn = checkIn;
+	}
+
+	/**
+	 * @return the checkOut
+	 */
+	public Date getCheckOut() {
+		return checkOut;
+	}
+
+	/**
+	 * @param checkOut
+	 *            the checkOut to set
+	 */
+	public void setCheckOut(Date checkOut) {
+		this.checkOut = checkOut;
+	}
+
+	/**
+	 * @return the exchange
+	 */
+	public Double getExchange() {
+		return exchange;
+	}
+
+	/**
+	 * @param exchange
+	 *            the exchange to set
+	 */
+	public void setExchange(Double exchange) {
+		this.exchange = exchange;
+	}
+
+	/**
+	 * @return the payPrice
+	 */
+	public Long getPayPrice() {
+		return payPrice;
+	}
+
+	/**
+	 * @param payPrice
+	 *            the payPrice to set
+	 */
+	public void setPayPrice(Long payPrice) {
+		this.payPrice = payPrice;
+	}
+
+	/**
+	 * @return the payPriceAtproperty
+	 */
+	public Long getPayPriceAtproperty() {
+		return payPriceAtproperty;
+	}
+
+	/**
+	 * @param payPriceAtproperty
+	 *            the payPriceAtproperty to set
+	 */
+	public void setPayPriceAtproperty(Long payPriceAtproperty) {
+		this.payPriceAtproperty = payPriceAtproperty;
+	}
+
+	/**
+	 * @return the payCurrency
+	 */
+	public String getPayCurrency() {
+		return payCurrency;
+	}
+
+	/**
+	 * @param payCurrency
+	 *            the payCurrency to set
+	 */
+	public void setPayCurrency(String payCurrency) {
+		this.payCurrency = payCurrency;
+	}
 
 	/**
 	 * @return the username
@@ -156,7 +251,7 @@ public class BillingHotel extends BaseObject {
 	/**
 	 * @return the hotelId
 	 */
-	public Long getHotelId() {
+	public Integer getHotelId() {
 		return hotelId;
 	}
 
@@ -164,7 +259,7 @@ public class BillingHotel extends BaseObject {
 	 * @param hotelId
 	 *            the hotelId to set
 	 */
-	public void setHotelId(Long hotelId) {
+	public void setHotelId(Integer hotelId) {
 		this.hotelId = hotelId;
 	}
 
@@ -201,7 +296,7 @@ public class BillingHotel extends BaseObject {
 	/**
 	 * @return the roomTypeId
 	 */
-	public Long getRoomTypeId() {
+	public Integer getRoomTypeId() {
 		return roomTypeId;
 	}
 
@@ -209,7 +304,7 @@ public class BillingHotel extends BaseObject {
 	 * @param roomTypeId
 	 *            the roomTypeId to set
 	 */
-	public void setRoomTypeId(Long roomTypeId) {
+	public void setRoomTypeId(Integer roomTypeId) {
 		this.roomTypeId = roomTypeId;
 	}
 
@@ -231,7 +326,7 @@ public class BillingHotel extends BaseObject {
 	/**
 	 * @return the roomNum
 	 */
-	public Integer getRoomNum() {
+	public String getRoomNum() {
 		return roomNum;
 	}
 
@@ -239,7 +334,7 @@ public class BillingHotel extends BaseObject {
 	 * @param roomNum
 	 *            the roomNum to set
 	 */
-	public void setRoomNum(Integer roomNum) {
+	public void setRoomNum(String roomNum) {
 		this.roomNum = roomNum;
 	}
 
@@ -301,21 +396,6 @@ public class BillingHotel extends BaseObject {
 	 */
 	public void setPaymentType(String paymentType) {
 		this.paymentType = paymentType;
-	}
-
-	/**
-	 * @return the payTypId
-	 */
-	public Integer getPayTypId() {
-		return payTypId;
-	}
-
-	/**
-	 * @param payTypId
-	 *            the payTypId to set
-	 */
-	public void setPayTypId(Integer payTypId) {
-		this.payTypId = payTypId;
 	}
 
 	/**

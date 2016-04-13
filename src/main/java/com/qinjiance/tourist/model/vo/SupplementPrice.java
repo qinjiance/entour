@@ -7,9 +7,9 @@ import module.laohu.commons.model.BaseObject;
 
 /**
  * @author Administrator
- *
+ * 
  * @datetime 2015年11月1日 下午11:35:50
- *
+ * 
  * @desc
  */
 public class SupplementPrice extends BaseObject {
@@ -24,11 +24,27 @@ public class SupplementPrice extends BaseObject {
 	private Boolean suppIsMandatory;
 	private Integer suppChargeType;
 	private String publishPrice;
+	private Integer suppType;
 
 	/**
 	 * 
 	 */
 	public SupplementPrice() {
+	}
+
+	/**
+	 * @return the suppType
+	 */
+	public Integer getSuppType() {
+		return suppType;
+	}
+
+	/**
+	 * @param suppType
+	 *            the suppType to set
+	 */
+	public void setSuppType(Integer suppType) {
+		this.suppType = suppType;
 	}
 
 	public Integer getSuppId() {

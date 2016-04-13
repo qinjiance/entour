@@ -15,16 +15,25 @@ public enum PayType {
 	/**
 	 * 支付宝
 	 */
-	ALIPAY(1);
+	ALIPAY("支付宝", 1);
 
+	private final String payType;
 	private final int payTypeId;
 
-	private PayType(int payTypeId) {
+	private PayType(String payType, int payTypeId) {
 		this.payTypeId = payTypeId;
+		this.payType = payType;
 	}
 
 	public int getPayTypeId() {
 		return payTypeId;
+	}
+
+	/**
+	 * @return the payType
+	 */
+	public String getPayType() {
+		return payType;
 	}
 
 	/**

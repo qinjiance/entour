@@ -1,13 +1,9 @@
 package com.qinjiance.tourist.mapper;
 
-import java.util.Map;
-
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-import com.github.miemiedev.mybatis.paginator.domain.PageBounds;
-import com.github.miemiedev.mybatis.paginator.domain.PageList;
 import com.qinjiance.tourist.model.po.BillingHotel;
 
 /**
@@ -23,6 +19,11 @@ import com.qinjiance.tourist.model.po.BillingHotel;
 public interface BillingHotelMapper {
 
 	public Integer insert(BillingHotel billingHotel);
+
+	@Update("update billing_hotel set exchange = #{exchange}, pay_price_atproperty = #{payPriceAtproperty}, pay_type = #{payType}, pay_price = #{payPrice} where id = #{orderId}")
+	public Integer updatePayInfo(@Param("exchange") Double exchange,
+			@Param("payPriceAtproperty") Long payPriceAtproperty, @Param("payType") String payType,
+			@Param("payPrice") Long payPrice, @Param("orderId") Long orderId);
 
 	@Update("update billing_hotel set pay_status = 1, gateway_order_id = #{gatewayOrderId}, real_pay_amount = #{realPayAmount}, pay_time = now() where id = #{id} and pay_status = 0")
 	public Integer updatePayOk(@Param("gatewayOrderId") String gatewayOrderId,

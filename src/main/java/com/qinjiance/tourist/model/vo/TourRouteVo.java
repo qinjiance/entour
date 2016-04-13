@@ -8,7 +8,7 @@ import module.laohu.commons.model.BaseObject;
 import com.qinjiance.tourist.model.po.Destination;
 import com.qinjiance.tourist.model.po.Arrival;
 import com.qinjiance.tourist.model.po.Departure;
-import com.qinjiance.tourist.model.po.Photo;
+import com.qinjiance.tourist.model.po.Exchange;
 import com.qinjiance.tourist.model.po.View;
 
 public class TourRouteVo extends BaseObject {
@@ -31,9 +31,9 @@ public class TourRouteVo extends BaseObject {
 	private String extra;
 	private String priceDetail;
 	private String description;
-	private List<Photo> bigPhotoes;
-	private List<Photo> middlePhotoes;
-	private List<Photo> smallPhotoes;
+	private List<Exchange> bigPhotoes;
+	private List<Exchange> middlePhotoes;
+	private List<Exchange> smallPhotoes;
 	private Date createTime;
 	private Date updateTime;
 
@@ -57,7 +57,7 @@ public class TourRouteVo extends BaseObject {
 	/**
 	 * @return the bigPhotoes
 	 */
-	public List<Photo> getBigPhotoes() {
+	public List<Exchange> getBigPhotoes() {
 
 		return bigPhotoes;
 	}
@@ -66,7 +66,7 @@ public class TourRouteVo extends BaseObject {
 	 * @param bigPhotoes
 	 *            the bigPhotoes to set
 	 */
-	public void setBigPhotoes(List<Photo> bigPhotoes) {
+	public void setBigPhotoes(List<Exchange> bigPhotoes) {
 
 		this.bigPhotoes = bigPhotoes;
 	}
@@ -74,7 +74,7 @@ public class TourRouteVo extends BaseObject {
 	/**
 	 * @return the middlePhotoes
 	 */
-	public List<Photo> getMiddlePhotoes() {
+	public List<Exchange> getMiddlePhotoes() {
 
 		return middlePhotoes;
 	}
@@ -83,7 +83,7 @@ public class TourRouteVo extends BaseObject {
 	 * @param middlePhotoes
 	 *            the middlePhotoes to set
 	 */
-	public void setMiddlePhotoes(List<Photo> middlePhotoes) {
+	public void setMiddlePhotoes(List<Exchange> middlePhotoes) {
 
 		this.middlePhotoes = middlePhotoes;
 	}
@@ -91,7 +91,7 @@ public class TourRouteVo extends BaseObject {
 	/**
 	 * @return the smallPhotoes
 	 */
-	public List<Photo> getSmallPhotoes() {
+	public List<Exchange> getSmallPhotoes() {
 
 		return smallPhotoes;
 	}
@@ -100,7 +100,7 @@ public class TourRouteVo extends BaseObject {
 	 * @param smallPhotoes
 	 *            the smallPhotoes to set
 	 */
-	public void setSmallPhotoes(List<Photo> smallPhotoes) {
+	public void setSmallPhotoes(List<Exchange> smallPhotoes) {
 
 		this.smallPhotoes = smallPhotoes;
 	}

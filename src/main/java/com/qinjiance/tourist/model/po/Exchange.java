@@ -6,8 +6,8 @@ import module.laohu.commons.model.BaseObject;
 
 import org.apache.ibatis.type.Alias;
 
-@Alias("photo")
-public class Photo extends BaseObject {
+@Alias("exchange")
+public class Exchange extends BaseObject {
 
 	/**
 	 * 
@@ -15,9 +15,9 @@ public class Photo extends BaseObject {
 	private static final long serialVersionUID = -7081816808907682529L;
 
 	private Long id;
-	private Long routeId;
-	private Integer scale;
-	private String relativePath;
+	private Integer type;
+	private String currency;
+	private Double exchange;
 	private Date createTime;
 	private Date updateTime;
 
@@ -25,7 +25,6 @@ public class Photo extends BaseObject {
 	 * @return the id
 	 */
 	public Long getId() {
-
 		return id;
 	}
 
@@ -34,66 +33,58 @@ public class Photo extends BaseObject {
 	 *            the id to set
 	 */
 	public void setId(Long id) {
-
 		this.id = id;
 	}
 
 	/**
-	 * @return the routeId
+	 * @return the type
 	 */
-	public Long getRouteId() {
-
-		return routeId;
+	public Integer getType() {
+		return type;
 	}
 
 	/**
-	 * @param routeId
-	 *            the routeId to set
+	 * @param type
+	 *            the type to set
 	 */
-	public void setRouteId(Long routeId) {
-
-		this.routeId = routeId;
+	public void setType(Integer type) {
+		this.type = type;
 	}
 
 	/**
-	 * @return the scale
+	 * @return the currency
 	 */
-	public Integer getScale() {
-
-		return scale;
+	public String getCurrency() {
+		return currency;
 	}
 
 	/**
-	 * @param scale
-	 *            the scale to set
+	 * @param currency
+	 *            the currency to set
 	 */
-	public void setScale(Integer scale) {
-
-		this.scale = scale;
+	public void setCurrency(String currency) {
+		this.currency = currency;
 	}
 
 	/**
-	 * @return the relativePath
+	 * @return the exchange
 	 */
-	public String getRelativePath() {
-
-		return relativePath;
+	public Double getExchange() {
+		return exchange;
 	}
 
 	/**
-	 * @param relativePath
-	 *            the relativePath to set
+	 * @param exchange
+	 *            the exchange to set
 	 */
-	public void setRelativePath(String relativePath) {
-
-		this.relativePath = relativePath;
+	public void setExchange(Double exchange) {
+		this.exchange = exchange;
 	}
 
 	/**
 	 * @return the createTime
 	 */
 	public Date getCreateTime() {
-
 		return createTime;
 	}
 
@@ -102,7 +93,6 @@ public class Photo extends BaseObject {
 	 *            the createTime to set
 	 */
 	public void setCreateTime(Date createTime) {
-
 		this.createTime = createTime;
 	}
 
@@ -110,7 +100,6 @@ public class Photo extends BaseObject {
 	 * @return the updateTime
 	 */
 	public Date getUpdateTime() {
-
 		return updateTime;
 	}
 
@@ -119,7 +108,6 @@ public class Photo extends BaseObject {
 	 *            the updateTime to set
 	 */
 	public void setUpdateTime(Date updateTime) {
-
 		this.updateTime = updateTime;
 	}
 
@@ -127,7 +115,6 @@ public class Photo extends BaseObject {
 	 * @return the serialversionuid
 	 */
 	public static long getSerialversionuid() {
-
 		return serialVersionUID;
 	}
 

@@ -17,14 +17,16 @@ import org.apache.commons.lang.StringUtils;
  */
 public enum Currency {
 
-	CNY("CNY", "¥"), USD("USD", "$"), EUR("EUR", "€");
+	CNY("CNY", "¥", 0), USD("USD", "$", 1), EUR("EUR", "€", 2);
 
 	private final String name;
 	private final String symbol;
+	private final int exchangeType;
 
-	private Currency(String name, String symbol) {
+	private Currency(String name, String symbol, int exchangeType) {
 		this.name = name;
 		this.symbol = symbol;
+		this.exchangeType = exchangeType;
 	}
 
 	public String getName() {
@@ -33,6 +35,13 @@ public enum Currency {
 
 	public String getSymbol() {
 		return symbol;
+	}
+
+	/**
+	 * @return the exchangeType
+	 */
+	public int getExchangeType() {
+		return exchangeType;
 	}
 
 	public static Currency getEnum(String name) {

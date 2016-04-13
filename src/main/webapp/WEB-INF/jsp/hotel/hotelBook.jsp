@@ -42,7 +42,7 @@
 										<p>
 											<c:forEach items="${occup.boardbases}" var="bob" varStatus="bobvs">
 												<input id="bob${bobvs.index}" name="bob" value="${bob.bbId}" bobPrice="${bob.bbPublishPrice}"
-													type="checkbox" ${(bob.bbPublishPrice=='0'||bob.bbPublishPrice=='0.00')?'checked="checked"':''} />
+													type="radio" ${(bob.bbPublishPrice=='0'||bob.bbPublishPrice=='0.00')?'checked="checked"':''} />
 												<label for="bob${bobvs.index}">${bob.bbName}(<span class="fee">${(bob.bbPublishPrice=='0'||bob.bbPublishPrice=='0.00')?'免费':'预付'}${(bob.bbPublishPrice=='0'||bob.bbPublishPrice=='0.00')?'':(holtelDetPrice.currency)}${(bob.bbPublishPrice=='0'||bob.bbPublishPrice=='0.00')?'':(bob.bbPublishPrice)}</span>)</label>
 											</c:forEach>
 										</p>

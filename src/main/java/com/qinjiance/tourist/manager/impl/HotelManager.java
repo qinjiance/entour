@@ -3,7 +3,6 @@
  */
 package com.qinjiance.tourist.manager.impl;
 
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -14,45 +13,34 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import module.laohu.commons.util.HexUtil;
 import module.laohu.commons.util.JsonUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.support.incrementer.MySQLMaxValueIncrementer;
 import org.springframework.stereotype.Service;
 
-import cn.arcgames.pay.constants.BillingDisplayType;
-import cn.arcgames.pay.constants.BillingGameShowType;
-import cn.arcgames.pay.constants.ChargeStatus;
-import cn.arcgames.pay.constants.Constants;
-import cn.arcgames.pay.constants.OrderType;
-import cn.arcgames.pay.constants.PayStatus;
-import cn.arcgames.pay.constants.PayTypeCategory;
-import cn.arcgames.pay.constants.UserTerminal;
-import cn.arcgames.pay.manager.exception.PayManagerException;
-import cn.arcgames.pay.manager.impl.BillingOrderManager;
-import cn.arcgames.pay.manager.impl.StatisticLogManager;
-import cn.arcgames.pay.model.po.BillingOrder;
-import cn.arcgames.pay.model.vo.BillingGame;
-import cn.arcgames.pay.model.vo.BillingGameDiscountVo;
-import cn.arcgames.pay.model.vo.BillingGatewayPayType;
-import cn.arcgames.pay.model.vo.GameChargeOrder;
-import cn.arcgames.pay.model.vo.GameServer;
-import cn.arcgames.pay.model.vo.PayUrlResult;
-import cn.arcgames.pay.model.vo.ThirdPayExtData;
-import cn.arcgames.pay.support.exception.SupportServiceException;
-
+import com.qinjiance.tourist.constants.Constants;
 import com.qinjiance.tourist.constants.Currency;
 import com.qinjiance.tourist.constants.PayType;
 import com.qinjiance.tourist.constants.SuppChargeType;
 import com.qinjiance.tourist.manager.IHotelManager;
 import com.qinjiance.tourist.manager.IUserManager;
 import com.qinjiance.tourist.manager.exception.ManagerException;
+import com.qinjiance.tourist.mapper.BillingHotelMapper;
+import com.qinjiance.tourist.mapper.ExchangeMapper;
+import com.qinjiance.tourist.model.po.BillingHotel;
+import com.qinjiance.tourist.model.po.Exchange;
 import com.qinjiance.tourist.model.po.User;
 import com.qinjiance.tourist.model.vo.BoardbasePrice;
 import com.qinjiance.tourist.model.vo.BoardbaseVo;
+import com.qinjiance.tourist.model.vo.BookRoomBoadBase;
+import com.qinjiance.tourist.model.vo.BookRoomContactPassenger;
+import com.qinjiance.tourist.model.vo.BookRoomInfo;
+import com.qinjiance.tourist.model.vo.BookRoomSupplement;
 import com.qinjiance.tourist.model.vo.HoltelDetPrice;
 import com.qinjiance.tourist.model.vo.HoltelDetVo;
 import com.qinjiance.tourist.model.vo.HotelBookRoomInfo;
@@ -64,6 +52,9 @@ import com.qinjiance.tourist.model.vo.RoomTypeVo;
 import com.qinjiance.tourist.model.vo.SearchHotelResult;
 import com.qinjiance.tourist.model.vo.SupplementPrice;
 import com.qinjiance.tourist.model.vo.SupplementVo;
+import com.qinjiance.tourist.support.alipay.AlipaySupport;
+import com.qinjiance.tourist.support.alipay.constant.AlipaySignType;
+import com.qinjiance.tourist.support.alipay.model.AlipayAccountConfig;
 import com.qinjiance.tourist.support.tourico.client.TouricoWSClient;
 import com.qinjiance.tourist.support.tourico.hotel.HotelFlowStub.Amenity_type0;
 import com.qinjiance.tourist.support.tourico.hotel.HotelFlowStub.ArrayOfBoardbase;
@@ -114,6 +105,19 @@ public class HotelManager implements IHotelManager {
 	private TouricoWSClient touricoWSClient;
 	@Autowired
 	private IUserManager userManager;
+	@Autowired
+	private ExchangeMapper exchangeMapper;
+	@Autowired
+	private BillingHotelMapper billingHotelMapper;
+	@Autowired
+	private MySQLMaxValueIncrementer orderIdSeqGenerater;
+
+	@Value(value = "#{configProperties['pay.host']}")
+	private String PAY_HOST;
+	@Value(value = "#{configProperties['alipay.partnerid']}")
+	private String ALIPAY_PARTNERID;
+	@Value(value = "#{configProperties['alipay.signkey']}")
+	private String ALIPAY_SIGNKEY;
 
 	/**
 	 * 
@@ -712,6 +716,7 @@ public class HotelManager implements IHotelManager {
 								supplementPrice.setSuppId(sup.getSuppId());
 								supplementPrice.setSuppIsMandatory(sup.getSuppIsMandatory());
 								supplementPrice.setSuppName(sup.getSuppName());
+								supplementPrice.setSuppType(sup.getSupptType());
 								supplementPrices.add(supplementPrice);
 							}
 							occupancyVo.setSupplements(supplementPrices);
@@ -759,9 +764,10 @@ public class HotelManager implements IHotelManager {
 	}
 
 	@Override
-	public String prePay(Long orderId, Integer hotelId, Date checkIn, Date checkOut, List<HotelBookRoomInfo> bookRoomInfo,
-			String roomInfo, Integer hotelRoomTypeId, String confirmEmail, Integer payTypeId, Long totalDaofu,
-			Long totalYufu, Long userId) throws ManagerException {
+	public String prePay(Long orderId, Integer hotelId, Date checkIn, Date checkOut,
+			List<HotelBookRoomInfo> hotelBookRoomInfos, String roomInfo, Integer hotelRoomTypeId, String confirmEmail,
+			Integer payTypeId, Long totalDaofu, Long totalYufu, Long userId, String bookCurrency)
+			throws ManagerException {
 		if (hotelId == null) {
 			throw new ManagerException("未选择酒店，请选择");
 		}
@@ -771,13 +777,16 @@ public class HotelManager implements IHotelManager {
 		if (checkIn.after(checkOut)) {
 			throw new ManagerException("入住时间不可晚于退房时间");
 		}
-		if (totalYufu==null) {
+		if (totalYufu == null) {
 			throw new ManagerException("支付金额不可为空");
 		}
-		if (totalDaofu==null) {
+		if (StringUtils.isBlank(bookCurrency)) {
+			throw new ManagerException("货币类型不可为空");
+		}
+		if (totalDaofu == null) {
 			throw new ManagerException("到付金额不可为空");
 		}
-		if (bookRoomInfo == null || bookRoomInfo.isEmpty()) {
+		if (hotelBookRoomInfos == null || hotelBookRoomInfos.isEmpty()) {
 			throw new ManagerException("未选择房间，请选择");
 		}
 		if (StringUtils.isBlank(confirmEmail) || CheckStyleUtil.checkStyle(confirmEmail, CheckStyleUtil.PATTERN_EMAIL)) {
@@ -786,6 +795,9 @@ public class HotelManager implements IHotelManager {
 		HoltelDetPrice holtelDetPrice = checkAvailabilityAndPrice(hotelId, checkIn, checkOut, roomInfo, hotelRoomTypeId);
 		if (holtelDetPrice == null) {
 			throw new ManagerException("该房型已不可预定，请重新查询酒店房型(err=1)");
+		}
+		if (!holtelDetPrice.getCurrency().equalsIgnoreCase(bookCurrency)) {
+			throw new ManagerException("货币类型变化，请重新查询酒店房型");
 		}
 		PayType payType = PayType.getEnum(payTypeId);
 		if (payType == null) {
@@ -810,7 +822,13 @@ public class HotelManager implements IHotelManager {
 		BoardbasePrice bb = null;
 		Map<Integer, SupplementPrice> supplementPriceMap = new HashMap<Integer, SupplementPrice>();
 		SupplementPrice supp = null;
-		for (HotelBookRoomInfo hotelBookRoomInfo : bookRoomInfo) {
+		List<BookRoomInfo> bookRoomInfos = new ArrayList<BookRoomInfo>();
+		BookRoomInfo bookRoomInfo = null;
+		BookRoomContactPassenger contactPassenger = null;
+		BookRoomBoadBase boadBase = null;
+		List<BookRoomSupplement> supplements = null;
+		BookRoomSupplement supplement = null;
+		for (HotelBookRoomInfo hotelBookRoomInfo : hotelBookRoomInfos) {
 			roomPrice = roomPriceMap.get(hotelBookRoomInfo.getRoomId());
 			if (roomPrice == null) {
 				throw new ManagerException("该房型已不可预定，请重新查询酒店房型(err=3)");
@@ -835,18 +853,16 @@ public class HotelManager implements IHotelManager {
 			for (BoardbasePrice boardbasePrice : occu.getBoardbases()) {
 				boardbasePriceMap.put(boardbasePrice.getBbId(), boardbasePrice);
 			}
-			for (Integer bbId : hotelBookRoomInfo.getBbIds()) {
-				bb = boardbasePriceMap.get(bbId);
-				if (bb == null) {
-					throw new ManagerException("该房型已不可预定，请重新查询酒店房型(err=7)");
-				}
-				roomYufu += Long.valueOf(new DecimalFormat("#").format(BigDecimal
-						.valueOf(Double.valueOf(bb.getBbPublishPrice())).multiply(BigDecimal.valueOf(100))
-						.doubleValue()));
+			bb = boardbasePriceMap.get(hotelBookRoomInfo.getBbId());
+			if (bb == null) {
+				throw new ManagerException("该房型已不可预定，请重新查询酒店房型(err=7)");
 			}
+			roomYufu += Long.valueOf(new DecimalFormat("#").format(BigDecimal
+					.valueOf(Double.valueOf(bb.getBbPublishPrice())).multiply(BigDecimal.valueOf(100)).doubleValue()));
 			for (SupplementPrice supplementPrice : occu.getSupplements()) {
 				supplementPriceMap.put(supplementPrice.getSuppId(), supplementPrice);
 			}
+			supplements = new ArrayList<BookRoomSupplement>();
 			for (Integer suppId : hotelBookRoomInfo.getSuppIds()) {
 				supp = supplementPriceMap.get(suppId);
 				if (supp == null) {
@@ -861,17 +877,53 @@ public class HotelManager implements IHotelManager {
 							.valueOf(Double.valueOf(supp.getPublishPrice())).multiply(BigDecimal.valueOf(100))
 							.doubleValue()));
 				}
+				supplement = new BookRoomSupplement();
+				supplement.setPublishPrice(Long.valueOf(new DecimalFormat("#").format(BigDecimal
+						.valueOf(Double.valueOf(supp.getPublishPrice())).multiply(BigDecimal.valueOf(100))
+						.doubleValue())));
+				supplement.setSuppChargeType(supp.getSuppChargeType());
+				supplement.setSuppId(supp.getSuppId());
+				supplement.setSuppIsMandatory(supp.getSuppIsMandatory());
+				supplement.setSuppName(supp.getSuppName());
+				supplement.setSuppType(supp.getSuppType());
+				supplements.add(supplement);
 			}
 			if (!roomYufu.equals(hotelBookRoomInfo.getYufu()) || !roomDaofu.equals(hotelBookRoomInfo.getDaofu())) {
 				throw new ManagerException("该房型已不可预定，请重新查询酒店房型(err=9)");
 			}
 			totalRoomDaofu += roomDaofu;
 			totalRoomYufu += roomYufu;
+
+			// 组装房间数据
+			bookRoomInfo = new BookRoomInfo();
+			bookRoomInfo.setAdultNum(roomPrice.getAdultNum());
+			bookRoomInfo.setBedding(occu.getBedding());
+			bookRoomInfo.setChildNum(roomPrice.getChildNum());
+			bookRoomInfo.setChildAges(roomPrice.getChildAges());
+			bookRoomInfo.setOccuId(occu.getOccuId());
+			bookRoomInfo.setOccuPrice(Long.valueOf(new DecimalFormat("#").format(BigDecimal
+					.valueOf(Double.valueOf(occu.getOccuPubPrice())).multiply(BigDecimal.valueOf(100)).doubleValue())));
+			bookRoomInfo.setRoomId(roomPrice.getRoomId());
+
+			contactPassenger = new BookRoomContactPassenger();
+			contactPassenger.setFirstname(hotelBookRoomInfo.getFirstname());
+			contactPassenger.setLastname(hotelBookRoomInfo.getLastname());
+			contactPassenger.setMobilephone(hotelBookRoomInfo.getPhonenumber());
+			bookRoomInfo.setContactPassenger(contactPassenger);
+
+			boadBase = new BookRoomBoadBase();
+			boadBase.setBbId(bb.getBbId());
+			boadBase.setName(bb.getBbName());
+			boadBase.setPrice(Long.valueOf(new DecimalFormat("#").format(BigDecimal
+					.valueOf(Double.valueOf(bb.getBbPublishPrice())).multiply(BigDecimal.valueOf(100)).doubleValue())));
+			bookRoomInfo.setBoadBase(boadBase);
+
+			bookRoomInfo.setSupplements(supplements);
+			bookRoomInfos.add(bookRoomInfo);
 		}
 		if (!totalRoomDaofu.equals(totalDaofu) || !totalRoomYufu.equals(totalYufu)) {
 			throw new ManagerException("该房型已不可预定，请重新查询酒店房型(err=10)");
 		}
-		// 支付方式
 		User user = null;
 		String username = null;
 		if (userId != null) {
@@ -881,256 +933,138 @@ public class HotelManager implements IHotelManager {
 			}
 			username = user.getEmail();
 		}
+		// 换算人民币
+		Currency currency = Currency.getEnum(holtelDetPrice.getCurrency());
+		if (currency == null) {
+			throw new ManagerException("该币种不支持");
+		}
+		Exchange exchange = exchangeMapper.getByType(currency.getExchangeType());
+		if (exchange == null) {
+			throw new ManagerException("该币种不支持支付");
+		}
+		Long payYufu = Double.doubleToLongBits(Math.ceil(totalYufu * exchange.getExchange()));
+		Long payDaofu = Double.doubleToLongBits(Math.ceil(totalDaofu * exchange.getExchange()));
 		// 去支付网关支付
-		String payUrlResult = thirdPay(orderId, totalYufu,
-				payType, userId, username);
-		if (payUrlResult == null) {
+		String subject = holtelDetPrice.getHotelName() + "-" + holtelDetPrice.getRoomType().getName();
+		String desc = holtelDetPrice.getHotelName() + "-" + holtelDetPrice.getRoomType().getName() + "-"
+				+ hotelBookRoomInfos.size() + "间房-" + holtelDetPrice.getRoomType().getNights() + "晚";
+		BillingHotel billingHotel = null;
+		if (orderId == null) {
+			orderId = orderIdSeqGenerater.nextLongValue();
+			// 新建订单
+			billingHotel = new BillingHotel();
+			billingHotel.setId(orderId);
+			billingHotel.setChargeStatus(0);
+			billingHotel.setConfirmationEmail(confirmEmail);
+			billingHotel.setContactInfo(confirmEmail);
+			billingHotel.setCurrency(holtelDetPrice.getCurrency());
+			billingHotel.setPayCurrency(Currency.CNY.getName());
+			billingHotel.setDeltaPrice(0);
+			billingHotel.setHotelAddress(holtelDetPrice.getAddress());
+			billingHotel.setHotelCity(holtelDetPrice.getCity());
+			billingHotel.setHotelCountry(holtelDetPrice.getCountry());
+			billingHotel.setHotelId(hotelId);
+			billingHotel.setHotelName(holtelDetPrice.getHotelName());
+			billingHotel.setIsOnlyAvailable(true);
+			billingHotel.setPaymentType("Obligo");
+			billingHotel.setCheckIn(checkIn);
+			billingHotel.setCheckOut(checkOut);
+			billingHotel.setPayStatus(0);
+			billingHotel.setPayType(payType.getPayType());
+			billingHotel.setPrice(totalYufu);
+			billingHotel.setPayPrice(payYufu);
+			billingHotel.setPriceAtproperty(totalDaofu);
+			billingHotel.setPayPriceAtproperty(payDaofu);
+			billingHotel.setExchange(exchange.getExchange());
+			billingHotel.setRoomInfos(JsonUtils.objectToJson(bookRoomInfos));
+			billingHotel.setRoomNum(roomInfo);
+			billingHotel.setRoomType(holtelDetPrice.getRoomType().getName());
+			billingHotel.setRoomTypeId(hotelRoomTypeId);
+			billingHotel.setUserId(userId);
+			billingHotel.setUsername(username);
+			Integer result = billingHotelMapper.insert(billingHotel);
+			if (result == null || result != 1) {
+				throw new ManagerException("订单创建失败");
+			}
+		} else {
+			// 支付旧订单
+			billingHotel = billingHotelMapper.getById(orderId);
+			if (billingHotel == null) {
+				throw new ManagerException("该订单不存在");
+			}
+			if (userId == null || billingHotel.getUserId() == null || billingHotel.getUserId().equals(userId)) {
+				throw new ManagerException("您的订单不存在");
+			}
+			if (billingHotel.getPayStatus().intValue() != 0 || billingHotel.getChargeStatus().intValue() != 0) {
+				throw new ManagerException("该订单已完成支付");
+			}
+			Integer result = billingHotelMapper.updatePayInfo(exchange.getExchange(), payDaofu, payType.getPayType(),
+					payYufu, orderId);
+			if (result == null || result != 1) {
+				throw new ManagerException("该订单不可支付");
+			}
+		}
+		String payUri = getThirdPayUrl(payType, "HT" + orderId.toString(), payYufu, subject, desc);
+		if (StringUtils.isBlank(payUri)) {
 			throw new ManagerException("打开支付失败，请稍后再试");
 		}
-		return payUrlResult;
+		return payUri;
 	}
-	
+
+	@Override
+	public String getThirdPayUrl(PayType payType, String orderId, Long payAmount, String subject, String description)
+			throws ManagerException {
+		if (payType == null) {
+			throw new ManagerException("不支持的支付方式");
+		}
+		// 根据支付方式支付
+		switch (payType) {
+		case ALIPAY:
+			return buildAlipayUrl(payType, orderId, payAmount, subject, description);
+		default:
+			throw new ManagerException("不支持的支付方式");
+		}
+	}
+
 	/**
-	 * 第三方支付网关支付
+	 * 构建支付宝表单
 	 * 
+	 * @param gatewayPayType
+	 * @param billingOrder
+	 * @param subject
+	 * @param body
+	 * @param displayType
+	 * @return
 	 */
-	protected String thirdPay(Long orderId, 
-			Long chargeAmount,  PayType payType, Long userId,
-			String username)
-			throws PayManagerException {
+	protected String buildAlipayUrl(PayType payType, String orderId, Long payAmount, String subject, String description)
+			throws ManagerException {
+		AlipayAccountConfig alipayAccountConfig = new AlipayAccountConfig();
+		alipayAccountConfig.setAntiFlag(true);
+		alipayAccountConfig.setPartnerId(ALIPAY_PARTNERID);
+		alipayAccountConfig.setSellerId(ALIPAY_PARTNERID);
+		alipayAccountConfig.setSignKey(ALIPAY_SIGNKEY);
+		alipayAccountConfig.setSignType(AlipaySignType.MD5);
+		// post表单构建
+		String syncNotifyUrl = PAY_HOST + Constants.SYNC_NOTIFY_URL + "/" + payType.getPayTypeId();
+		String asyncNotifyUrl = PAY_HOST + Constants.ASYNC_NOTIFY_URL + "/" + payType.getPayTypeId();
 
-		Long preOrderId = orderId;
-		if (preOrderId == null) {
-			preOrderId = sequenceManager.getOrderIdSeq();
-		}
-
-		// 方法调用性能统计开始
-		Date methodStateTime = new Date();
-
-		try {
-			orderType = orderType == null ? OrderType.GAME : orderType;
-			Long gameId = orderType == OrderType.COUPON ? null : billingGame.getGameId();
-			String gameName = orderType == OrderType.COUPON ? null : billingGame.getGameInfo().getName();
-
-			// 计算赠送和折扣
-			BillingGameDiscountVo billingGameDiscountVo = null;
-			if (gameId != null) {
-				billingGameDiscountVo = billingConfigManager.getBillingGameDiscount(gameId);
-			}
-			Long bonus = billingConfigManager.getBonus(billingGameDiscountVo, billingGatewayPayType, chargeAmount);
-			Double discount = billingConfigManager.getDiscount(billingGameDiscountVo, billingGatewayPayType,
-					chargeAmount);
-			Long realChargeAmount = billingConfigManager.getRealChargeAmount(billingGameDiscountVo,
-					billingGatewayPayType, chargeAmount);
-			Long payAmount = billingConfigManager.getPayAmount(billingGameDiscountVo, billingGatewayPayType,
-					chargeAmount);
-
-			// 记录充值信息
-			StringBuilder productInfo = new StringBuilder();
-			productInfo.append(billingGatewayPayType.getGatewayName()).append("-")
-					.append(billingGatewayPayType.getPayTypeName()).append(": ")
-					.append(new DecimalFormat("#.##").format(payAmount / (double) 100)).append("元");
-
-			Long auOrderId = null;
-			String gameOrderId = "";
-			String gameExtraInfo = "";
-			Long to173userId = null;
-			switch (orderType) {
-			case COUPON:
-				// 到完美支付获取订单号，防止重复
-				try {
-					gameOrderId = preOrderId.toString();
-					auOrderId = Long.valueOf(wanmeiPayService.getTradeSequence(billingGatewayPayType.getGatewayId()));
-				} catch (SupportServiceException e) {
-					throw new PayManagerException("订单号创建失败");
-				} catch (NumberFormatException e) {
-					throw new PayManagerException("订单号创建失败");
-				}
-				break;
-			default:
-				// 无冬使用AU充值
-				if (gameServerManager.isAUGame(billingGame.getGameInfo()) || billingGame.getGameId() == 200007L) {
-					// 到完美支付获取订单号，防止重复
-					try {
-						gameOrderId = preOrderId.toString();
-						auOrderId = Long
-								.valueOf(wanmeiPayService.getTradeSequence(billingGatewayPayType.getGatewayId()));
-					} catch (SupportServiceException e) {
-						throw new PayManagerException("订单号创建失败");
-					} catch (NumberFormatException e) {
-						throw new PayManagerException("订单号创建失败");
-					}
-				} else {
-					Long gameOrderUserId = toUserId;
-					// 173的游戏需要173UserId
-					if (gameServerManager.is173Game(billingGame.getGameInfo())) {
-						try {
-							to173userId = auUserService.get173UserIdByUserId(toUserId);
-						} catch (SupportServiceException e) {
-							throw new PayManagerException(e.getMessage());
-						}
-						// 用户无对应的173userId，则直接提示未创建角色，因为只要玩过173游戏就会有173userId
-						if (to173userId == null) {
-							throw new PayManagerException("该账号未创建游戏角色");
-						}
-						gameOrderUserId = to173userId;
-					}
-					// 是否需要到游戏下单
-					if (billingGame.getNeedPreorder() != null && billingGame.getNeedPreorder().booleanValue()) {
-						GameChargeOrder gameOrder = gameConnectManager.preChargeOrder(billingGame.getGameId(),
-								serverId, gameOrderUserId, payAmount, realChargeAmount);
-						if (gameOrder == null) {
-							throw new PayManagerException("游戏下单失败");
-						}
-						gameOrderId = gameOrder.getGameOrderId();
-						gameExtraInfo = gameOrder.getGameExtraInfo();
-					} else {
-						gameOrderId = preOrderId.toString();
-					}
-				}
-				break;
-			}
-			// 不可为null，否则支付通知是url编码会抛空指针
-			if (StringUtils.isBlank(gameExtraInfo)) {
-				gameExtraInfo = "";
-			}
-			if (StringUtils.isBlank(gameOrderId)) {
-				throw new PayManagerException("订单号创建失败");
-			}
-			if (!isGameOrderIdValid(gameId, serverId, gameOrderId, orderType)) {
-				throw new PayManagerException("游戏订单号重复");
-			}
-			BillingOrder billingOrder = null;
-			// 透传信息
-			ThirdPayExtData thirdPayExtData = new ThirdPayExtData();
-			if (showType != null) {
-				thirdPayExtData.setShowType(showType.getShowType());
-			}
-			String payExtraInfo = null;
-			try {
-				payExtraInfo = HexUtil.toHexString(JsonUtils.objectToJson(thirdPayExtData).getBytes(Constants.CHARSET));
-			} catch (UnsupportedEncodingException e) {
-				logger.warn("UnsupportedEncodingException", e);
-				payExtraInfo = HexUtil.toHexString(JsonUtils.objectToJson(thirdPayExtData).getBytes());
-			}
-			if (orderId == null) {
-				// 新建订单
-				orderId = preOrderId;
-				billingOrder = createNewBillingOrder(orderId, gameId, gameName, gameOrderId, gameRole,
-						billingGatewayPayType.getGatewayId(), discount, bonus, chargeAmount, realChargeAmount,
-						payAmount, userTerminal, billingGatewayPayType.getPayTypeId(),
-						billingGatewayPayType.getPayTypeName(), payUserId, toUserId, productInfo.toString(), serverId,
-						gameServer.getFullName(), orderType, payExtraInfo, gameExtraInfo, auOrderId, to173userId,
-						orderIp);
-				logger.info("Creating billing order: " + billingOrder.toString());
-				Integer result = billingOrderMapper.insert(billingOrder);
-				if (result == null || result != 1) {
-					logger.info("Create billing order failed: " + billingOrder.toString());
-					throw new PayManagerException("订单创建失败");
-				}
-			} else {
-				// 支付旧订单
-				billingOrder = billingOrderMapper.getById(orderId);
-				if (billingOrder == null) {
-					throw new PayManagerException("该订单不存在");
-				}
-				if (billingOrder.getPayUserId().longValue() != payUserId.longValue()) {
-					throw new PayManagerException("您的订单不存在");
-				}
-				if (billingOrder.getPayStatus().intValue() != PayStatus.NOT_PAY.getStatus()
-						|| billingOrder.getChargeStatus().intValue() != ChargeStatus.NOT_CHARGE.getStatus()) {
-					throw new PayManagerException("该订单已进行过支付操作");
-				}
-				billingOrder.setGameId(gameId);
-				billingOrder.setTo173UserId(to173userId);
-				billingOrder.setAuOrderId(auOrderId);
-				billingOrder.setGameName(billingGame.getGameInfo().getName());
-				billingOrder.setGameOrderId(gameOrderId);
-				billingOrder.setPayExtraInfo(payExtraInfo);
-				billingOrder.setGameExtraInfo(gameExtraInfo);
-				billingOrder.setGameRole(gameRole);
-				billingOrder.setGatewayId(billingGatewayPayType.getGatewayId());
-				billingOrder.setId(orderId);
-				billingOrder.setBonusAmount(bonus);
-				billingOrder.setPayDiscount(discount);
-				billingOrder.setRealChargeAmount(realChargeAmount);
-				billingOrder.setOrderAmount(chargeAmount);
-				billingOrder.setPayAmount(payAmount);
-				billingOrder.setOrderIp(orderIp);
-				billingOrder.setOrderSource(userTerminal.getTerminal());
-				billingOrder.setPayTypeId(billingGatewayPayType.getPayTypeId());
-				billingOrder.setPayTypeName(billingGatewayPayType.getPayTypeName());
-				billingOrder.setProductInfo(productInfo.toString());
-				billingOrder.setServerId(serverId);
-				billingOrder.setServerName(gameServer.getFullName());
-				billingOrder.setToUserId(toUserId);
-				logger.info("Recreating billing order: " + billingOrder.toString());
-				Integer result = billingOrderMapper.updateNewOrder(billingOrder);
-				if (result == null || result != 1) {
-					logger.info("Recreate billing order failed: " + billingOrder.toString());
-					throw new PayManagerException("该订单不可支付");
-				}
-			}
-			// 构造支付表单字符串
-			String subject = "ARC充值";
-			String description = "ARC充值";
-			switch (orderType) {
-			case COUPON:
-				subject = "完美点券";
-				description = couponManager.getCouponByYuan(realChargeAmount / 100) + "点";
-				break;
-			case GAME:
-				subject = billingGame.getGameInfo().getName() + "-" + billingGame.getCurrencyName();
-				description = gameServer.getFullName() + "--" + realChargeAmount / 100
-						* billingGame.getYuanToCurrencyRatio() + billingGame.getCurrencyName();
-				break;
-			default:
-				break;
-			}
-			PayTypeCategory payTypeCategory = PayTypeCategory.getEnum(billingGatewayPayType.getCategory());
-			if (payTypeCategory == null) {
-				payTypeCategory = PayTypeCategory.DIRECT;
-			}
-			BillingDisplayType displayType = BillingDisplayType.WEB;
-			switch (payTypeCategory) {
-			case QRCODE:
-				displayType = BillingDisplayType.QRCODE;
-				break;
-			default:
-				displayType = BillingDisplayType.WEB;
-				break;
-			}
-			// 充值调用性能统计开始
-			Date payStateTime = new Date();
-
-			String payUri = null;
-			try {
-				payUri = getThirdPayForm(billingGatewayPayType, billingOrder, subject, description, displayType);
-			} finally {
-				// 充值调用性能统计结束
-				StatisticLogManager.logPerformance(BillingOrderManager.class.getSimpleName() + "#ThirdPay#"
-						+ billingGatewayPayType.getGatewayName(), "orderId=" + preOrderId.toString(), payStateTime,
-						new Date());
-			}
-
-			if (StringUtils.isBlank(payUri)) {
-				logger.error("Create third pay form failed. params: " + billingOrder.toString());
-				throw new PayManagerException("下单失败");
-			}
-			PayUrlResult result = new PayUrlResult();
-			result.setOrderId(billingOrder.getId());
-			switch (payTypeCategory) {
-			case QRCODE:
-				result.setPayUrl(payUri);
-				return result;
-			default:
-				memcacheManager.put(getPayKeyCacheKey(orderId.toString()), payUri, Constants.MIN_1_CACHE_TIME);
-				return result;
-			}
-		} finally {
-			// 方法调用性能统计结束
-			StatisticLogManager.logPerformance(BillingOrderManager.class.getSimpleName() + "#ThirdPay", "orderId="
-					+ preOrderId.toString(), methodStateTime, new Date());
-		}
+		// 把请求参数打包成数组
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("out_trade_no", orderId);
+		params.put("subject", subject);
+		params.put("body", description);
+		params.put("total_fee", new DecimalFormat("#.##").format(payAmount / (double) 100));
+		params.put("paymethod", "directPay");
+		params.put("defaultbank", "");
+		params.put("anti_phishing_key", "");
+		params.put("exter_invoke_ip", "");
+		// 公用回传参数，如果用户请求时传递了该参数，则返回给商户时会回传该参数。可存放任何内容（除=、&等特殊字符外），不会显示在页面上。
+		params.put("extra_common_param", "");
+		params.put("buyer_email", "");
+		params.put("show_url", "");
+		params.put("royalty_type", "");
+		params.put("royalty_parameters", "");
+		// 余额支付
+		return AlipaySupport.createDerectPayRequest(params, syncNotifyUrl, asyncNotifyUrl, false, alipayAccountConfig);
 	}
 }

@@ -26,7 +26,7 @@ public class HotelBookRoomInfo extends BaseObject {
 
 	private Integer roomId;
 	private String occuId;
-	private List<Integer> bbIds;
+	private Integer bbId;
 	private List<Integer> suppIds;
 	private Long daofu;
 	private Long yufu;
@@ -72,18 +72,18 @@ public class HotelBookRoomInfo extends BaseObject {
 	}
 
 	/**
-	 * @return the bbIds
+	 * @return the bbId
 	 */
-	public List<Integer> getBbIds() {
-		return bbIds;
+	public Integer getBbId() {
+		return bbId;
 	}
 
 	/**
-	 * @param bbIds
-	 *            the bbIds to set
+	 * @param bbId
+	 *            the bbId to set
 	 */
-	public void setBbIds(List<Integer> bbIds) {
-		this.bbIds = bbIds;
+	public void setBbId(Integer bbId) {
+		this.bbId = bbId;
 	}
 
 	/**
