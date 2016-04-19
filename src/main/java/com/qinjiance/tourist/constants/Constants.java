@@ -29,6 +29,6 @@ public class Constants {
 	public static final int EMAIL_CAPTCHA_INTETVAl = 60;// 60秒， 发送间隔
 
 	// 第三方支付网关回调地址
-	public static String SYNC_NOTIFY_URL = "/thirdPay/notify/sync";
-	public static String ASYNC_NOTIFY_URL = "/thirdPay/notify/async";
+	public static String HOTEL_SYNC_NOTIFY_URL = "/thirdPay/notify/hotel/sync";
+	public static String HOTEL_ASYNC_NOTIFY_URL = "/thirdPay/notify/hotel/async";
 }

@@ -5,6 +5,7 @@ package com.qinjiance.tourist.manager;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.qinjiance.tourist.constants.PayType;
 import com.qinjiance.tourist.manager.exception.ManagerException;
@@ -12,6 +13,8 @@ import com.qinjiance.tourist.model.vo.HoltelDetPrice;
 import com.qinjiance.tourist.model.vo.HoltelDetVo;
 import com.qinjiance.tourist.model.vo.HotelBookRoomInfo;
 import com.qinjiance.tourist.model.vo.SearchHotelResult;
+import com.wanmei.intra.pay.constants.BillingDisplayType;
+import com.wanmei.intra.pay.model.vo.WanmeiPayNotify;
 
 /**
  * @author Jiance Qin
@@ -40,4 +43,17 @@ public interface IHotelManager {
 
 	String getThirdPayUrl(PayType PayType, String orderId, Long payAmount, String subject, String description)
 			throws ManagerException;
+	/**
+	 * 处理支付宝异步通知
+	 * 
+	 * @return
+	 */
+	public String handleAlipayAsyncNotify(Map<String, String> params, BillingDisplayType billingDisplayType);
+
+	/**
+	 * 处理支付宝同步通知
+	 * 
+	 * @return
+	 */
+	public WanmeiPayNotify handleAlipaySyncNotify(Map<String, String> params, BillingDisplayType billingDisplayType);
 }
