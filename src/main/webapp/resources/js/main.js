@@ -29,6 +29,14 @@ function isChinese(s){
     return pattern.test(s);
 }
 
+function stringToHex(str){
+	var val="";
+	for(var i = 0; i < str.length; i++){
+		val += str.charCodeAt(i).toString(16);
+	}
+	return val;
+}
+
 function getPasswordStrength(password) {
 	var hasNum = false;
 	var hasUpperLetter = false;

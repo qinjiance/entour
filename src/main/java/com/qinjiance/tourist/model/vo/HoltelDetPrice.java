@@ -28,6 +28,7 @@ public class HoltelDetPrice extends BaseObject {
 	private String address;
 	private String starsLevel;
 	private String currency;
+	private String currencySymbol;
 	private String thumb;
 	private RoomTypePrice roomType;
 	private String hotelCatalog;
@@ -36,6 +37,20 @@ public class HoltelDetPrice extends BaseObject {
 	 * 
 	 */
 	public HoltelDetPrice() {
+	}
+
+	/**
+	 * @return the currencySymbol
+	 */
+	public String getCurrencySymbol() {
+		return currencySymbol;
+	}
+
+	/**
+	 * @param currencySymbol the currencySymbol to set
+	 */
+	public void setCurrencySymbol(String currencySymbol) {
+		this.currencySymbol = currencySymbol;
 	}
 
 	public String getThumb() {

@@ -99,7 +99,7 @@
 		</div>
 	</div>
 	
-	<div id="noHotel" style="display: none;"><span class="label">暂无路线，敬请期待...</span></div>
+	<div id="noHotel" style="display: none;"><span class="label">暂无租车信息，敬请期待...</span></div>
 	
 	<div id="carTemp" style="display: none;">
 		<div class="bref">

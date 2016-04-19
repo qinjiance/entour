@@ -15,6 +15,8 @@
 <script type="text/javascript"
 	src="${ctx}<fmt:message key="static.resources.host"/>/js/jquery.yx_rotaion.js"></script>
 <script type="text/javascript"
+	src="${ctx}<fmt:message key="static.resources.host"/>/js/dialog.js"></script>
+<script type="text/javascript"
 	src="${ctx}<fmt:message key="static.resources.host"/>/js/main.js"></script>
 <script type="text/javascript">
 	$(document).ready(function(e) {

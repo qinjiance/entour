@@ -76,7 +76,7 @@
 		</div>
 	</div>
 	
-	<div id="noHotel" style="display: none;"><span class="label">暂无路线，敬请期待...</span></div>
+	<div id="noHotel" style="display: none;"><span class="label">暂无活动项目，敬请期待...</span></div>
 	
 	<div id="hotelTemplate" style="display: none;">
 		<div class="bref">

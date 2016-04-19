@@ -34,7 +34,7 @@ public interface IHotelManager {
 			Integer hotelRoomTypeId) throws ManagerException;
 
 	String prePay(Long orderId, Integer hotelId, Date checkIn, Date checkOut,
-			List<HotelBookRoomInfo> hotelBookRoomInfos, String roomInfo, Integer hotelRoomTypeId, String confirmEmail,
+			String hotelBookRoomInfosStr, String roomInfo, Integer hotelRoomTypeId, String confirmEmail,
 			Integer payTypeId, Long totalDaofu, Long totalYufu, Long userId, String bookCurrency)
 			throws ManagerException;
 

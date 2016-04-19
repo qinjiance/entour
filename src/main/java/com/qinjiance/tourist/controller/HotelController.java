@@ -3,6 +3,9 @@ package com.qinjiance.tourist.controller;
 import java.util.Date;
 import java.util.List;
 
+import module.laohu.commons.model.ResponseResult;
+import module.laohu.commons.util.DateUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -18,9 +21,7 @@ import com.qinjiance.tourist.model.vo.DestinationVo;
 import com.qinjiance.tourist.model.vo.HoltelDetPrice;
 import com.qinjiance.tourist.model.vo.HoltelDetVo;
 import com.qinjiance.tourist.model.vo.SearchHotelResult;
-
-import module.laohu.commons.model.ResponseResult;
-import module.laohu.commons.util.DateUtils;
+import com.qinjiance.tourist.util.CookieUtil;
 
 /**
  * @author "Jiance Qin"
@@ -54,8 +55,8 @@ public class HotelController extends BaseTouristController {
 	 * @return
 	 */
 	@RequestMapping(value = "/searchHotels")
-	public String searchHotels(@RequestParam String desLabel, @RequestParam String desValue, @RequestParam Date checkIn,
-			@RequestParam Date checkOut, @RequestParam String roomInfo, ModelMap model) {
+	public String searchHotels(@RequestParam String desLabel, @RequestParam String desValue,
+			@RequestParam Date checkIn, @RequestParam Date checkOut, @RequestParam String roomInfo, ModelMap model) {
 
 		model.put("desLabel", desLabel);
 		model.put("desValue", desValue);
@@ -72,8 +73,8 @@ public class HotelController extends BaseTouristController {
 	@RequestMapping(value = "/getHotels")
 	@ResponseBody
 	public ResponseResult<SearchHotelResult> getHotels(@RequestParam String desLabel, @RequestParam String desValue,
-			@RequestParam Date checkIn, @RequestParam Date checkOut, @RequestParam String roomInfo, Integer searchStars,
-			Integer searchPrices, String searchHotelCat) {
+			@RequestParam Date checkIn, @RequestParam Date checkOut, @RequestParam String roomInfo,
+			Integer searchStars, Integer searchPrices, String searchHotelCat) {
 		ResponseResult<SearchHotelResult> rr = new ResponseResult<SearchHotelResult>();
 		rr.setCode(Constants.CODE_FAIL);
 		try {
@@ -125,5 +126,29 @@ public class HotelController extends BaseTouristController {
 		}
 
 		return "hotel/hotelBook";
+	}
+
+	/**
+	 * @return
+	 */
+	@RequestMapping(value = "/hotelPrepay")
+	@ResponseBody
+	public ResponseResult<String> hotelPrepay(Long orderId, @RequestParam Integer hotelId,
+			@RequestParam Date checkIn, @RequestParam Date checkOut, @RequestParam String hotelBookRoomInfosStr,
+			@RequestParam String roomInfo, @RequestParam Integer hotelRoomTypeId, @RequestParam String confirmEmail,
+			@RequestParam Integer payTypeId, @RequestParam Long totalDaofu, @RequestParam Long totalYufu,
+			@RequestParam String bookCurrency) {
+		ResponseResult<String> rr = new ResponseResult<String>();
+		rr.setCode(Constants.CODE_FAIL);
+		try {
+			String ret = hotelManager.prePay(orderId, hotelId, checkIn, checkOut, hotelBookRoomInfosStr, roomInfo,
+					hotelRoomTypeId, confirmEmail, payTypeId, totalDaofu, totalYufu, CookieUtil.getUserIdFromCookie(),
+					bookCurrency);
+			rr.setCode(Constants.CODE_SUCC);
+			rr.setResult(ret);
+		} catch (ManagerException e) {
+			rr.setMessage(e.getMessage());
+		}
+		return rr;
 	}
 }

@@ -17,6 +17,7 @@
 	<c:set var="navi" value="0" />
 	<%@include file="../common/header.jspf"%>
 
+	<form id="inp" action="">
 	<div class="bgbody">
 		<div class="xbody">
 				<div class="myleft">
@@ -43,14 +44,14 @@
 											<c:forEach items="${occup.boardbases}" var="bob" varStatus="bobvs">
 												<input id="bob${bobvs.index}" name="bob" value="${bob.bbId}" bobPrice="${bob.bbPublishPrice}"
 													type="radio" ${(bob.bbPublishPrice=='0'||bob.bbPublishPrice=='0.00')?'checked="checked"':''} />
-												<label for="bob${bobvs.index}">${bob.bbName}(<span class="fee">${(bob.bbPublishPrice=='0'||bob.bbPublishPrice=='0.00')?'免费':'预付'}${(bob.bbPublishPrice=='0'||bob.bbPublishPrice=='0.00')?'':(holtelDetPrice.currency)}${(bob.bbPublishPrice=='0'||bob.bbPublishPrice=='0.00')?'':(bob.bbPublishPrice)}</span>)</label>
+												<label for="bob${bobvs.index}">${bob.bbName}(<span class="fee">${(bob.bbPublishPrice=='0'||bob.bbPublishPrice=='0.00')?'免费':'预付'}${(bob.bbPublishPrice=='0'||bob.bbPublishPrice=='0.00')?'':(holtelDetPrice.currencySymbol)}${(bob.bbPublishPrice=='0'||bob.bbPublishPrice=='0.00')?'':(bob.bbPublishPrice)}</span>)</label>
 											</c:forEach>
 										</p>
 										<p>
 											<c:forEach items="${occup.supplements}" var="supp" varStatus="suppvs">
 												<input id="supp${suppvs.index}" name="supp" value="${supp.suppId}" suppPrice="${supp.publishPrice}" suppChargeType="supp.suppChargeType"
 													type="checkbox" ${(supp.suppIsMandatory==true)?'checked="checked" disabled="disabled"':((supp.suppChargeType==1||supp.publishPrice=='0'||supp.publishPrice=='0.00')?'checked="checked"':'')} />
-												<label for="supp${suppvs.index}">${supp.suppName}(<span class="fee">${(supp.suppChargeType==1||supp.publishPrice=='0'||supp.publishPrice=='0.00')?'免费':((supp.suppChargeType==2)?'预付':'到付')}${(supp.suppChargeType==1||supp.publishPrice=='0'||supp.publishPrice=='0.00')?'':(holtelDetPrice.currency)}${(supp.suppChargeType==1||supp.publishPrice=='0'||supp.publishPrice=='0.00')?'':(supp.publishPrice)}</span>)</label>
+												<label for="supp${suppvs.index}">${supp.suppName}(<span class="fee">${(supp.suppChargeType==1||supp.publishPrice=='0'||supp.publishPrice=='0.00')?'免费':((supp.suppChargeType==2)?'预付':'到付')}${(supp.suppChargeType==1||supp.publishPrice=='0'||supp.publishPrice=='0.00')?'':(holtelDetPrice.currencySymbol)}${(supp.suppChargeType==1||supp.publishPrice=='0'||supp.publishPrice=='0.00')?'':(supp.publishPrice)}</span>)</label>
 											</c:forEach>
 										</p>
 									</div>
@@ -101,29 +102,29 @@
 								<c:forEach items="${room.occupancyVos}" var="occup" varStatus="occvs">
 									<div class="occup" occId="${occup.occuId}" occPrice="${occup.occuPubPrice}" style="${(occvs.index==0)?'':'display:none;'}">
 										<c:forEach items="${occup.priceBreakdown}" var="pribre" varStatus="prvs">
-											<p class="pric"><span class="ite">第${prvs.index+1}晚</span><span class="iteprice">${holtelDetPrice.currency}${pribre}</span></p>
+											<p class="pric"><span class="ite">第${prvs.index+1}晚</span><span class="iteprice">${holtelDetPrice.currencySymbol}${pribre}</span></p>
 										</c:forEach>
-										<p class="pric"><span class="iteprice">(含税${holtelDetPrice.currency}${occup.taxPubPrice})</span></p>
+										<p class="pric"><span class="iteprice">(含税${holtelDetPrice.currencySymbol}${occup.taxPubPrice})</span></p>
 										<c:forEach items="${occup.boardbases}" var="bob" varStatus="bobvs">
 											<p class="pric bob" bbId="${bob.bbId}" style="${(bob.bbPublishPrice=='0'||bob.bbPublishPrice=='0.00')?'':'display:none;'}">
-												<span class="ite">${bob.bbName}</span><span class="iteprice">${holtelDetPrice.currency}${bob.bbPublishPrice}</span>
+												<span class="ite">${bob.bbName}</span><span class="iteprice">${holtelDetPrice.currencySymbol}${bob.bbPublishPrice}</span>
 											</p>
 										</c:forEach>
 										<c:forEach items="${occup.supplements}" var="supp" varStatus="suppvs">
 											<p class="pric supp" suppId="${supp.suppId}" ctype="${supp.suppChargeType}" style="${(supp.suppIsMandatory==true||supp.suppChargeType==1||supp.publishPrice=='0'||supp.publishPrice=='0.00')?'':'display:none;'}">
-												<span class="ite">${supp.suppName}</span><span class="iteprice">${(supp.suppChargeType==3)?'到店支付':''}${holtelDetPrice.currency}${supp.publishPrice}</span>
+												<span class="ite">${supp.suppName}</span><span class="iteprice">${(supp.suppChargeType==3)?'到店支付':''}${holtelDetPrice.currencySymbol}${supp.publishPrice}</span>
 											</p>
 										</c:forEach>
-										<p class="pric"><span class="itett">预付小计</span><span class="itepricett ">${holtelDetPrice.currency}<span class="yufu"> -</span></span></p>
-										<p class="pric"><span class="itett">到付小计</span><span class="itepricett ">${holtelDetPrice.currency}<span class="daofu"> -</span></span></p>
+										<p class="pric"><span class="itett">预付小计</span><span class="itepricett ">${holtelDetPrice.currencySymbol}<span class="yufu"> -</span></span></p>
+										<p class="pric"><span class="itett">到付小计</span><span class="itepricett ">${holtelDetPrice.currencySymbol}<span class="daofu"> -</span></span></p>
 									</div>
 								</c:forEach>
 							</div>
 						</c:forEach>
 						<hr />
 						<div class="htrp">
-							<p class="pric"><span class="itett">预付总计</span><span class="itepricett ">${holtelDetPrice.currency}<span class="yufutt"> -</span></span></p>
-							<p class="pric"><span class="itett">到付总计</span><span class="itepricett ">${holtelDetPrice.currency}<span class="daofutt"> -</span></span></p>
+							<p class="pric"><span class="itett">预付总计</span><span class="itepricett ">${holtelDetPrice.currencySymbol}<span class="yufutt"> -</span></span></p>
+							<p class="pric"><span class="itett">到付总计</span><span class="itepricett ">${holtelDetPrice.currencySymbol}<span class="daofutt"> -</span></span></p>
 						</div>
 						<hr />
 						<div class="til">
@@ -138,6 +139,40 @@
 				</div>
 		</div>
 	</div>
+	</form>
+	
+	<div id="topay" title="去支付" class="easyui-dialog" data-options="buttons:'#bb',modal:true,width:400,height:200,closed:true,draggable:false,resizable:false" style="text-align: center;font-size: 18px;">
+		支付总金额<span class="mon"></span>，将按照当前汇率折合为人民币通过支付宝支付，请确认
+	</div>
+	<div id="bb">
+		<a class="gopay" href="#" target="_blank" style="border: 1px solid rgb(149,184,231);padding:5px;">确定</a>
+	</div>
+	
+    <div class="pageLoading" style="display:none;">
+    	<img src="${ctx}<fmt:message key="static.resources.host"/>/img/laoding1.gif" />
+    	<div class="close" ></div>
+    </div>
+    
+	<div id="paying" title="正在支付" class="easyui-dialog" data-options="buttons:'#bb1',modal:true,width:400,height:200,closed:true,draggable:false,resizable:false" style="text-align: center;font-size: 18px;">
+		<p>请在新页面支付</p>
+		<p>付款完成前请不要关闭此窗口</p>
+	</div>
+    <div id="bb1">
+        <a href="javascript:void(0)" class="easyui-linkbutton payed">完成支付</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton nopay">取消支付</a>
+    </div>
+    
+	<form id="hotelPrepay" action="${ctx}/hotelPrepay">
+		<input type="hidden" name="hotelId" value="${hotelId}" />
+		<input type="hidden" name="checkIn" value="${checkIn}" />
+		<input type="hidden" name="checkOut" value="${checkOut}" />
+		<input type="hidden" name="roomInfo" value="${roomInfo}" />
+		<input type="hidden" name="hotelRoomTypeId" value="${hotelRoomTypeId}" />
+		<input type="hidden" name="hotelBookRoomInfosStr" value="${hotelBookRoomInfosStr}" />
+		<input type="hidden" name="bookCurrency" value="${holtelDetPrice.currency}" />
+		<input type="hidden" name="totalYufu" value="" />
+		<input type="hidden" name="totalDaofu" value="" />
+	</form>
 
 	<!-- footer -->
 	<%@include file="../common/footer.jspf"%>
@@ -148,10 +183,119 @@
 		src="${ctx}<fmt:message key="static.resources.host"/>/js/myfocus/myfocus-2.0.4.min.js"></script>
 	
 	<script type="text/javascript">
+		function prepay(payTypeId){
+			if(!$("#inp").form("validate")){
+				return;
+			}
+			sum();
+			var confirmEmail = $("input[name=email]").val();
+			if(!confirmEmail){
+				return;
+			}
+			if(!payTypeId){
+				return 
+			}
+			var hotelId = $("input[name=hotelId]").val();
+			if(!hotelId){
+				return;
+			}
+			var checkIn = $("input[name=checkIn]").val();
+			if(!checkIn){
+				return;
+			}
+			var checkOut = $("input[name=checkOut]").val();
+			if(!checkOut){
+				return;
+			}
+			var roomInfo = $("input[name=roomInfo]").val();
+			if(!roomInfo){
+				return;
+			}
+			var hotelRoomTypeId = $("input[name=hotelRoomTypeId]").val();
+			if(!hotelRoomTypeId){
+				return;
+			}
+			var totalYufu = $("input[name=totalYufu]").val();
+			if(!totalYufu.trim()){
+				return;
+			}
+			var totalDaofu = $("input[name=totalDaofu]").val();
+			if(!totalDaofu.trim()){
+				return;
+			}
+			var bookCurrency = $("input[name=bookCurrency]").val();
+			if(!bookCurrency.trim()){
+				return;
+			}
+			var hotelBookRoomInfosStr = $("input[name=hotelBookRoomInfosStr]").val();
+			if(!hotelBookRoomInfosStr){
+				return;
+			}
+			var data = {
+					hotelId : hotelId,
+					checkIn : checkIn,
+					checkOut : checkOut,
+					hotelBookRoomInfosStr : hotelBookRoomInfosStr,
+					roomInfo : roomInfo,
+					hotelRoomTypeId : hotelRoomTypeId,
+					confirmEmail : confirmEmail,
+					payTypeId : payTypeId,
+					totalDaofu : totalDaofu,
+					totalYufu : totalYufu,
+					bookCurrency : bookCurrency
+			};
+			openLoading();
+			$.ajax({
+			    type: 'get',
+			    url: '${ctx}hotelPrepay',
+			    data: data,
+			    success: function(ret) {
+			    	if(ret.code==0){
+			    		$("#topay .mon").html('${holtelDetPrice.currencySymbol}'+$(".yufutt").html());
+						$("#bb a").attr("href",ret.result);
+						$('#topay').dialog({
+							closed:false,
+							style:{
+								right:'',
+								top:document.body.scrollTop+document.documentElement.scrollTop,
+								bottom:''
+							}
+						});
+					}else{
+						$.messager.show({
+							title:'消息提示',
+							msg:ret.message,
+							timeout:0,
+							showType:'slide',
+							style:{
+								right:'',
+								top:document.body.scrollTop+document.documentElement.scrollTop,
+								bottom:''
+							}
+						});
+					}
+			    },
+			    complete: function(XHR, TS){
+			    	closeLoading();
+			    }
+			});
+		}
+		function openLoading() {
+			closeLoading();
+			$(".pageLoading").jqueryDialog({
+				"cancelbtn" : ".close"
+			});
+		}
+		function closeLoading() {
+			$("#myDialogbox").hide();
+		}
 		function sum(){
 			var sum=0;
 			var daofuSum=0;
+			var hotelBookRoomInfos=[];
 			$(".room").each(function(i,e){
+				var hotelBookRoomInfo={};
+				var suppIds=[];
 				var roomId=$(this).attr('roomId');
 				var occuId=$(this).find("select[name=bedding]").val();
 				var occuPrice=Number($(this).find(".colu[occId='"+occuId+"']").attr("occPrice"));
@@ -159,10 +303,12 @@
 				$(this).find("input[name=bob]").each(function(i,e){
 					if($(e).prop("checked")){
 						occuPrice+=Number($(e).attr("bobPrice"));
+						hotelBookRoomInfo.bbId=$(e).val();
 					}
 				});
 				$(this).find("input[name=supp]").each(function(i,e){
 					if($(e).prop("checked")){
+						suppIds.push($(e).val());
 						if($(e).attr("suppChargeType")==2){
 							occuPrice+=Number($(e).attr("suppPrice"));
 						}else if($(e).attr("suppChargeType")==3){
@@ -174,9 +320,23 @@
 				$(".roomSum[roomId="+roomId+"] .occup[occId='"+occuId+"'] .daofu").html(daofuPrice.toFixed(2));
 				sum+=occuPrice;
 				daofuSum+=daofuPrice;
+
+				hotelBookRoomInfo.roomId=roomId;
+				hotelBookRoomInfo.occuId=occuId;
+				hotelBookRoomInfo.yufu=(Number(occuPrice)*100).toFixed(0);
+				hotelBookRoomInfo.daofu=(Number(daofuPrice)*100).toFixed(0);
+				hotelBookRoomInfo.suppIds=suppIds;
+				hotelBookRoomInfo.firstname=$(this).find("input[name=firstname]").val();
+				hotelBookRoomInfo.lastname=$(this).find("input[name=lastname]").val();
+				hotelBookRoomInfo.phonenumber=$(this).find("select[name=ccode]").val()+"-"+$(this).find("input[name=phone]").val();
+				hotelBookRoomInfos.push(hotelBookRoomInfo);
 			});
-			$(".yufutt").html(sum.toFixed(2));
-			$(".daofutt").html(daofuSum.toFixed(2));
+			$("input[name=hotelBookRoomInfosStr]").val(stringToHex(JSON.stringify(hotelBookRoomInfos)));
+			
+			$(".yufutt").html(sum);
+			$("input[name=totalYufu]").val((Number(sum)*100).toFixed(0));
+			$(".daofutt").html(daofuSum);
+			$("input[name=totalDaofu]").val((Number(daofuSum)*100).toFixed(0));
 		}
 		$(document).ready(function(){
 			$.extend($.fn.validatebox.defaults.rules, {
@@ -225,6 +385,23 @@
 				sum();
 			});
 			sum();
+			$(".opp").click(function(){
+				prepay(1);
+			});
+			$(".gopay").click(function(){
+				$('#topay').dialog('close');
+				$('#paying').dialog({
+					closed:false,
+					style:{
+						right:'',
+						top:document.body.scrollTop+document.documentElement.scrollTop,
+						bottom:''
+					}
+				});
+			});
+			$(".nopay").click(function(){
+				window.location.reload();
+			});
 		});
 	</script>
 </body>
