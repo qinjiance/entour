@@ -40,6 +40,9 @@ public class AlipaySupport {
 
 	protected static final Logger logger = LoggerFactory.getLogger(AlipaySupport.class);
 
+	public final static String RESPONSE_TO_ALIPAY_SUCCESS = "success";
+	public final static String RESPONSE_TO_ALIPAY_FAILED = "failed";
+
 	/**
 	 * 
 	 */

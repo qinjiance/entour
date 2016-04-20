@@ -13,9 +13,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import module.laohu.commons.pay.alipay.model.AlipayNotifyAsync;
+import module.laohu.commons.pay.alipay.model.AlipayNotifySync;
 import module.laohu.commons.util.HexUtil;
 import module.laohu.commons.util.JsonUtils;
-import module.laohu.commons.util.XmlUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -56,6 +57,7 @@ import com.qinjiance.tourist.model.vo.SupplementPrice;
 import com.qinjiance.tourist.model.vo.SupplementVo;
 import com.qinjiance.tourist.support.alipay.AlipaySupport;
 import com.qinjiance.tourist.support.alipay.constant.AlipaySignType;
+import com.qinjiance.tourist.support.alipay.constant.AlipayTradeStatus;
 import com.qinjiance.tourist.support.alipay.model.AlipayAccountConfig;
 import com.qinjiance.tourist.support.tourico.client.TouricoWSClient;
 import com.qinjiance.tourist.support.tourico.hotel.HotelFlowStub.Amenity_type0;
@@ -87,20 +89,6 @@ import com.qinjiance.tourist.support.tourico.hotel.HotelFlowStub.SearchHotelsByI
 import com.qinjiance.tourist.support.tourico.hotel.HotelFlowStub.SearchRequest;
 import com.qinjiance.tourist.support.tourico.hotel.HotelFlowStub.Supplement;
 import com.qinjiance.tourist.util.CheckStyleUtil;
-import com.wanmei.intra.pay.constants.BillingDisplayType;
-import com.wanmei.intra.pay.constants.PayConstant;
-import com.wanmei.intra.pay.model.po.BillingAlipayAccount;
-import com.wanmei.intra.pay.model.po.BillingOrder;
-import com.wanmei.intra.pay.model.vo.WanmeiPayNotify;
-import com.wanmei.intra.pay.support.alipay.constant.AlipayTradeStatus;
-import com.wanmei.intra.pay.support.alipay.model.AlipayMobileNotifyAsync;
-import com.wanmei.intra.pay.support.alipay.model.AlipayNotifyAsync;
-import com.wanmei.intra.pay.support.alipay.model.AlipayNotifySync;
-import com.wanmei.intra.pay.support.alipay.model.AlipayQrcodeNotifyAsync;
-import com.wanmei.intra.pay.support.alipay.model.AlipayWapNotifyAsync;
-import com.wanmei.intra.pay.support.alipay.model.AlipayWapNotifySync;
-import com.wanmei.intra.pay.support.alipay.model.QrcodePayNotifyDataAsync;
-import com.wanmei.intra.pay.support.alipay.model.WapPayAsyncNotifyData;
 
 /**
  * @author Jiance Qin
@@ -1037,7 +1025,7 @@ public class HotelManager implements IHotelManager {
 				throw new ManagerException("该订单不可支付");
 			}
 		}
-		String payUri = getThirdPayUrl(payType, "HT" + orderId.toString(), payYufu, subject, desc);
+		String payUri = getThirdPayUrl(payType, orderId.toString(), payYufu, subject, desc);
 		if (StringUtils.isBlank(payUri)) {
 			throw new ManagerException("打开支付失败，请稍后再试");
 		}
@@ -1063,7 +1051,7 @@ public class HotelManager implements IHotelManager {
 	 * 构建支付宝表单
 	 * 
 	 * @param gatewayPayType
-	 * @param billingOrder
+	 * @param billingHotel
 	 * @param subject
 	 * @param body
 	 * @param displayType
@@ -1100,348 +1088,137 @@ public class HotelManager implements IHotelManager {
 		// 余额支付
 		return AlipaySupport.createDerectPayRequest(params, syncNotifyUrl, asyncNotifyUrl, false, alipayAccountConfig);
 	}
-	
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.wanmei.intra.pay.manager.IBillingOrderManager#handleAlipaySyncNotify
-	 * (java.util.Map, com.wanmei.intra.pay.constants.BillingDisplayType)
-	 */
 	@Override
-	public WanmeiPayNotify handleAlipaySyncNotify(Map<String, String> params, BillingDisplayType billingDisplayType) {
-		switch (billingDisplayType) {
-		case WEB:
-			AlipayNotifySync notifySync = JsonUtils.parseToObject(JsonUtils.objectToJson(params),
-					AlipayNotifySync.class);
-			if (notifySync != null) {
-				// 检查订单是否存在
-				BillingOrder billingOrder = billingOrderMapper.getByOrderId(notifySync.getOut_trade_no());
-				if (billingOrder == null) {
-					logger.error("订单不存在. params: " + notifySync.toString());
-					return createWanmeiPayNotify(new BillingOrder(), null, PayConstant.FAILED, "订单不存在");
-				} else {
-					BillingAlipayAccount billingAlipayAccount = billingThirdpayAccountManager
-							.getAlipayAccount(billingOrder.getThirdpayAccountName());
-					if (billingAlipayAccount == null) {
-						logger.error("收款账号不存在. params: " + notifySync.toString());
-						return createWanmeiPayNotify(billingOrder, null, PayConstant.FAILED, "收款账号不存在");
-					} else {
-						boolean verifyOk = alipaySupport.verifyNotify(params, billingAlipayAccount);
-						if (verifyOk) {
-							AlipayTradeStatus tradeStatus = AlipayTradeStatus.getEnum(notifySync.getTrade_status());
-							// 支付成功
-							if (tradeStatus == AlipayTradeStatus.TRADE_SUCCESS
-									|| tradeStatus == AlipayTradeStatus.TRADE_FINISHED) {
-								Long payAmount = Long.valueOf(new DecimalFormat("#").format(BigDecimal
-										.valueOf(Double.valueOf(notifySync.getTotal_fee()))
-										.multiply(BigDecimal.valueOf(100)).doubleValue()));
-								WanmeiPayNotify wanmeiPayNotify = thirdPayOrderSuccuss(notifySync.getTrade_no(),
-										payAmount, notifySync.getExtra_common_param(), billingOrder);
-								// 同步通知地址
-								wanmeiPayNotify.setNotifyUrl(billingOrder.getSyncNotifyUrl());
-								return wanmeiPayNotify;
-							} else {
-								logger.error("网关支付失败. params: " + notifySync.toString());
-								return createWanmeiPayNotify(billingOrder, null, PayConstant.FAILED, "支付失败");
-							}
-						} else {
-							logger.error("通知验证无效. params: " + notifySync.toString());
-							return createWanmeiPayNotify(billingOrder, null, PayConstant.FAILED, "通知验证无效");
-						}
-					}
-				}
+	public Map<String, String> handleAlipaySyncNotify(Map<String, String> params) {
+		Map<String, String> result = null;
+		AlipayNotifySync notifySync = JsonUtils.parseToObject(JsonUtils.objectToJson(params), AlipayNotifySync.class);
+		if (notifySync != null) {
+			// 检查订单是否存在
+			BillingHotel billingHotel = billingHotelMapper.getById(Long.valueOf(notifySync.getOut_trade_no()));
+			if (billingHotel == null) {
+				logger.error("订单不存在. params: " + notifySync.toString());
 			} else {
-				logger.error("通知参数有误. params: " + params.toString());
-				return createWanmeiPayNotify(new BillingOrder(), null, PayConstant.FAILED, "通知参数有误");
-			}
-		case WAP:
-			AlipayWapNotifySync wapNotifySync = JsonUtils.parseToObject(JsonUtils.objectToJson(params),
-					AlipayWapNotifySync.class);
-			if (wapNotifySync != null) {
-				// 检查订单是否存在
-				BillingOrder billingOrder = billingOrderMapper.getByOrderId(wapNotifySync.getOut_trade_no());
-				if (billingOrder == null) {
-					logger.error("订单不存在. params: " + wapNotifySync.toString());
-					return createWanmeiPayNotify(new BillingOrder(), null, PayConstant.FAILED, "订单不存在");
-				} else {
-					BillingAlipayAccount billingAlipayAccount = billingThirdpayAccountManager
-							.getAlipayAccount(billingOrder.getThirdpayAccountName());
-					if (billingAlipayAccount == null) {
-						logger.error("收款账号不存在. params: " + wapNotifySync.toString());
-						return createWanmeiPayNotify(billingOrder, null, PayConstant.FAILED, "收款账号不存在");
+				AlipayAccountConfig alipayAccountConfig = new AlipayAccountConfig();
+				alipayAccountConfig.setAntiFlag(true);
+				alipayAccountConfig.setPartnerId(ALIPAY_PARTNERID);
+				alipayAccountConfig.setSellerId(ALIPAY_PARTNERID);
+				alipayAccountConfig.setSignKey(ALIPAY_SIGNKEY);
+				alipayAccountConfig.setSignType(AlipaySignType.MD5);
+				boolean verifyOk = AlipaySupport.verifyNotify(params, alipayAccountConfig);
+				if (verifyOk) {
+					AlipayTradeStatus tradeStatus = AlipayTradeStatus.getEnum(notifySync.getTrade_status());
+					// 支付成功
+					if (tradeStatus == AlipayTradeStatus.TRADE_SUCCESS
+							|| tradeStatus == AlipayTradeStatus.TRADE_FINISHED) {
+						Long payAmount = Long.valueOf(new DecimalFormat("#").format(BigDecimal
+								.valueOf(Double.valueOf(notifySync.getTotal_fee())).multiply(BigDecimal.valueOf(100))
+								.doubleValue()));
+						result = thirdPayOrderSuccuss(notifySync.getTrade_no(), payAmount,
+								notifySync.getExtra_common_param(), billingHotel);
+						// 同步通知地址
+						return result;
 					} else {
-						boolean verifyOk = alipaySupport.verifyWapSyncNotify(params, billingAlipayAccount);
-						if (verifyOk) {
-							String tradeStatus = wapNotifySync.getResult();
-							// 支付成功
-							if (StringUtils.isNotBlank(tradeStatus) && tradeStatus.equals("success")) {
-								WanmeiPayNotify wanmeiPayNotify = thirdPayOrderSuccuss(wapNotifySync.getTrade_no(),
-										billingOrder.getPayAmount(), "", billingOrder);
-								// 同步通知地址
-								wanmeiPayNotify.setNotifyUrl(billingOrder.getSyncNotifyUrl());
-								return wanmeiPayNotify;
-							} else {
-								logger.error("网关支付失败. params: " + wapNotifySync.toString());
-								return createWanmeiPayNotify(billingOrder, null, PayConstant.FAILED, "支付失败");
-							}
-						} else {
-							logger.error("通知验证无效. params: " + wapNotifySync.toString());
-							return createWanmeiPayNotify(billingOrder, null, PayConstant.FAILED, "通知验证无效");
-						}
+						logger.error("网关支付失败. params: " + notifySync.toString());
 					}
+				} else {
+					logger.error("通知验证无效. params: " + notifySync.toString());
 				}
-			} else {
-				logger.error("通知参数有误. params: " + params.toString());
-				return createWanmeiPayNotify(new BillingOrder(), null, PayConstant.FAILED, "通知参数有误");
 			}
-		case APP:
+		} else {
 			logger.error("通知参数有误. params: " + params.toString());
-			return createWanmeiPayNotify(new BillingOrder(), null, PayConstant.FAILED, "通知参数有误");
-		default:
-			logger.error("通知参数有误. params: " + params.toString());
-			return createWanmeiPayNotify(new BillingOrder(), null, PayConstant.FAILED, "通知参数有误");
 		}
+		result = new HashMap<String, String>();
+		result.put("err", "1");
+		result.put("payedOrderId", notifySync.getOut_trade_no());
+		return result;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.wanmei.intra.pay.manager.IBillingOrderManager#handleAlipayAsyncNotify
-	 * (java.util.Map, com.wanmei.intra.pay.constants.BillingDisplayType)
-	 */
 	@Override
-	public String handleAlipayAsyncNotify(Map<String, String> params, BillingDisplayType billingDisplayType) {
-		switch (billingDisplayType) {
-		case API:
-			AlipayNotifyAsync apiNotifyAsync = JsonUtils.parseToObject(JsonUtils.objectToJson(params),
-					AlipayNotifyAsync.class);
-			if (apiNotifyAsync != null) {
-				// 检查订单是否存在
-				BillingOrder billingOrder = billingOrderMapper.getByOrderId(apiNotifyAsync.getOut_trade_no());
-				if (billingOrder == null) {
-					logger.error("订单不存在. params: " + apiNotifyAsync.toString());
+	public String handleAlipayAsyncNotify(Map<String, String> params) {
+		AlipayNotifyAsync notifyAsync = JsonUtils
+				.parseToObject(JsonUtils.objectToJson(params), AlipayNotifyAsync.class);
+		if (notifyAsync != null) {
+			// 检查订单是否存在
+			BillingHotel billingHotel = billingHotelMapper.getById(Long.valueOf(notifyAsync.getOut_trade_no()));
+			if (billingHotel == null) {
+				logger.error("订单不存在. params: " + notifyAsync.toString());
+			} else {
+				AlipayAccountConfig alipayAccountConfig = new AlipayAccountConfig();
+				alipayAccountConfig.setAntiFlag(true);
+				alipayAccountConfig.setPartnerId(ALIPAY_PARTNERID);
+				alipayAccountConfig.setSellerId(ALIPAY_PARTNERID);
+				alipayAccountConfig.setSignKey(ALIPAY_SIGNKEY);
+				alipayAccountConfig.setSignType(AlipaySignType.MD5);
+				boolean verifyOk = AlipaySupport.verifyNotify(params, alipayAccountConfig);
+				if (verifyOk) {
+					AlipayTradeStatus tradeStatus = AlipayTradeStatus.getEnum(notifyAsync.getTrade_status());
+					// 支付成功
+					if (tradeStatus == AlipayTradeStatus.TRADE_SUCCESS
+							|| tradeStatus == AlipayTradeStatus.TRADE_FINISHED) {
+						Long payAmount = Long.valueOf(new DecimalFormat("#").format(BigDecimal
+								.valueOf(Double.valueOf(notifyAsync.getTotal_fee())).multiply(BigDecimal.valueOf(100))
+								.doubleValue()));
+						Map<String, String> result = thirdPayOrderSuccuss(notifyAsync.getTrade_no(), payAmount,
+								notifyAsync.getExtra_common_param(), billingHotel);
+						if (result != null && !result.isEmpty()) {
+							return AlipaySupport.RESPONSE_TO_ALIPAY_SUCCESS;
+						}
+					} else {
+						logger.error("网关支付失败. params: " + notifyAsync.toString());
+					}
 				} else {
-					BillingAlipayAccount billingAlipayAccount = billingThirdpayAccountManager
-							.getAlipayAccount(billingOrder.getThirdpayAccountName());
-					if (billingAlipayAccount == null) {
-						logger.error("收款账号不存在. params: " + apiNotifyAsync.toString());
-					} else {
-						boolean verifyOk = alipaySupport.verifyDutAsyncNotify(params, billingAlipayAccount);
-						if (verifyOk) {
-							AlipayTradeStatus tradeStatus = AlipayTradeStatus.getEnum(apiNotifyAsync.getTrade_status());
-							// 支付成功
-							if (tradeStatus == AlipayTradeStatus.TRADE_SUCCESS
-									|| tradeStatus == AlipayTradeStatus.TRADE_FINISHED) {
-								Long payAmount = Long.valueOf(new DecimalFormat("#").format(BigDecimal
-										.valueOf(Double.valueOf(apiNotifyAsync.getTotal_fee()))
-										.multiply(BigDecimal.valueOf(100)).doubleValue()));
-								WanmeiPayNotify wanmeiPayNotify = thirdPayOrderSuccuss(apiNotifyAsync.getTrade_no(),
-										payAmount, apiNotifyAsync.getExtra_common_param(), billingOrder);
-								if (wanmeiPayNotify != null
-										&& wanmeiPayNotify.getWanmeiPayNotifyParams() != null
-										&& wanmeiPayNotify.getWanmeiPayNotifyParams().getPayResult() == PayConstant.SUCCESS) {
-									return AlipaySupport.RESPONSE_TO_ALIPAY_SUCCESS;
-								}
-							} else {
-								logger.error("网关支付失败. params: " + apiNotifyAsync.toString());
-							}
-						} else {
-							logger.error("通知验证无效. params: " + apiNotifyAsync.toString());
-						}
-					}
+					logger.error("通知验证无效. params: " + notifyAsync.toString());
 				}
-			} else {
-				logger.error("通知参数有误. params: " + params.toString());
 			}
-			return AlipaySupport.RESPONSE_TO_ALIPAY_FAILED;
-		case WEB:
-			AlipayNotifyAsync notifyAsync = JsonUtils.parseToObject(JsonUtils.objectToJson(params),
-					AlipayNotifyAsync.class);
-			if (notifyAsync != null) {
-				// 检查订单是否存在
-				BillingOrder billingOrder = billingOrderMapper.getByOrderId(notifyAsync.getOut_trade_no());
-				if (billingOrder == null) {
-					logger.error("订单不存在. params: " + notifyAsync.toString());
-				} else {
-					BillingAlipayAccount billingAlipayAccount = billingThirdpayAccountManager
-							.getAlipayAccount(billingOrder.getThirdpayAccountName());
-					if (billingAlipayAccount == null) {
-						logger.error("收款账号不存在. params: " + notifyAsync.toString());
-					} else {
-						boolean verifyOk = alipaySupport.verifyNotify(params, billingAlipayAccount);
-						if (verifyOk) {
-							AlipayTradeStatus tradeStatus = AlipayTradeStatus.getEnum(notifyAsync.getTrade_status());
-							// 支付成功
-							if (tradeStatus == AlipayTradeStatus.TRADE_SUCCESS
-									|| tradeStatus == AlipayTradeStatus.TRADE_FINISHED) {
-								Long payAmount = Long.valueOf(new DecimalFormat("#").format(BigDecimal
-										.valueOf(Double.valueOf(notifyAsync.getTotal_fee()))
-										.multiply(BigDecimal.valueOf(100)).doubleValue()));
-								WanmeiPayNotify wanmeiPayNotify = thirdPayOrderSuccuss(notifyAsync.getTrade_no(),
-										payAmount, notifyAsync.getExtra_common_param(), billingOrder);
-								if (wanmeiPayNotify != null
-										&& wanmeiPayNotify.getWanmeiPayNotifyParams() != null
-										&& wanmeiPayNotify.getWanmeiPayNotifyParams().getPayResult() == PayConstant.SUCCESS) {
-									return AlipaySupport.RESPONSE_TO_ALIPAY_SUCCESS;
-								}
-							} else {
-								logger.error("网关支付失败. params: " + notifyAsync.toString());
-							}
-						} else {
-							logger.error("通知验证无效. params: " + notifyAsync.toString());
-						}
-					}
-				}
-			} else {
-				logger.error("通知参数有误. params: " + params.toString());
-			}
-			return AlipaySupport.RESPONSE_TO_ALIPAY_FAILED;
-		case WAP:
-			AlipayWapNotifyAsync wapNotifyAsync = JsonUtils.parseToObject(JsonUtils.objectToJson(params),
-					AlipayWapNotifyAsync.class);
-			if (wapNotifyAsync != null) {
-				WapPayAsyncNotifyData wapPayAsyncNotifyData = XmlUtils.toObject(wapNotifyAsync.getNotify_data(),
-						WapPayAsyncNotifyData.class);
-				if (wapPayAsyncNotifyData != null) {
-					// 检查订单是否存在
-					BillingOrder billingOrder = billingOrderMapper
-							.getByOrderId(wapPayAsyncNotifyData.getOut_trade_no());
-					if (billingOrder == null) {
-						logger.error("订单不存在. params: " + wapNotifyAsync.toString());
-					} else {
-						BillingAlipayAccount billingAlipayAccount = billingThirdpayAccountManager
-								.getAlipayAccount(billingOrder.getThirdpayAccountName());
-						if (billingAlipayAccount == null) {
-							logger.error("收款账号不存在. params: " + wapNotifyAsync.toString());
-						} else {
-							boolean verifyOk = alipaySupport.verifyWapAsyncNotify(params, billingAlipayAccount);
-							if (verifyOk) {
-								AlipayTradeStatus tradeStatus = AlipayTradeStatus.getEnum(wapPayAsyncNotifyData
-										.getTrade_status());
-								// 支付成功
-								if (tradeStatus == AlipayTradeStatus.TRADE_SUCCESS
-										|| tradeStatus == AlipayTradeStatus.TRADE_FINISHED) {
-									Long payAmount = Long.valueOf(new DecimalFormat("#").format(BigDecimal
-											.valueOf(Double.valueOf(wapPayAsyncNotifyData.getTotal_fee()))
-											.multiply(BigDecimal.valueOf(100)).doubleValue()));
-									WanmeiPayNotify wanmeiPayNotify = thirdPayOrderSuccuss(
-											wapPayAsyncNotifyData.getTrade_no(), payAmount, "", billingOrder);
-									if (wanmeiPayNotify != null
-											&& wanmeiPayNotify.getWanmeiPayNotifyParams() != null
-											&& wanmeiPayNotify.getWanmeiPayNotifyParams().getPayResult() == PayConstant.SUCCESS) {
-										return AlipaySupport.RESPONSE_TO_ALIPAY_SUCCESS;
-									}
-								} else {
-									logger.error("网关支付失败. params: " + wapNotifyAsync.toString());
-								}
-							} else {
-								logger.error("通知验证无效. params: " + wapNotifyAsync.toString());
-							}
-						}
-					}
-				}
-			} else {
-				logger.error("通知参数有误. params: " + params.toString());
-			}
-			return AlipaySupport.RESPONSE_TO_ALIPAY_FAILED;
-		case APP:
-			AlipayMobileNotifyAsync mobileNotifyAsync = JsonUtils.parseToObject(JsonUtils.objectToJson(params),
-					AlipayMobileNotifyAsync.class);
-			if (mobileNotifyAsync != null) {
-				// 检查订单是否存在
-				BillingOrder billingOrder = billingOrderMapper.getByOrderId(mobileNotifyAsync.getOut_trade_no());
-				if (billingOrder == null) {
-					logger.error("订单不存在. params: " + mobileNotifyAsync.toString());
-				} else {
-					BillingAlipayAccount billingAlipayAccount = billingThirdpayAccountManager
-							.getAlipayAccount(billingOrder.getThirdpayAccountName());
-					if (billingAlipayAccount == null) {
-						logger.error("收款账号不存在. params: " + mobileNotifyAsync.toString());
-					} else {
-						boolean verifyOk = alipaySupport.verifyMobileNotify(params, billingAlipayAccount);
-						if (verifyOk) {
-							AlipayTradeStatus tradeStatus = AlipayTradeStatus.getEnum(mobileNotifyAsync
-									.getTrade_status());
-							// 支付成功
-							if (tradeStatus == AlipayTradeStatus.TRADE_SUCCESS
-									|| tradeStatus == AlipayTradeStatus.TRADE_FINISHED) {
-								Long payAmount = Long.valueOf(new DecimalFormat("#").format(BigDecimal
-										.valueOf(Double.valueOf(mobileNotifyAsync.getTotal_fee()))
-										.multiply(BigDecimal.valueOf(100)).doubleValue()));
-								WanmeiPayNotify wanmeiPayNotify = thirdPayOrderSuccuss(mobileNotifyAsync.getTrade_no(),
-										payAmount, "", billingOrder);
-								if (wanmeiPayNotify != null
-										&& wanmeiPayNotify.getWanmeiPayNotifyParams() != null
-										&& wanmeiPayNotify.getWanmeiPayNotifyParams().getPayResult() == PayConstant.SUCCESS) {
-									return AlipaySupport.RESPONSE_TO_ALIPAY_SUCCESS;
-								}
-							} else {
-								logger.error("网关支付失败. params: " + mobileNotifyAsync.toString());
-							}
-						} else {
-							logger.error("通知验证无效. params: " + mobileNotifyAsync.toString());
-						}
-					}
-				}
-			} else {
-				logger.error("通知参数有误. params: " + params.toString());
-			}
-			return AlipaySupport.RESPONSE_TO_ALIPAY_FAILED;
-		case QRCODE:
-			AlipayQrcodeNotifyAsync qrcodeNotifyAsync = JsonUtils.parseToObject(JsonUtils.objectToJson(params),
-					AlipayQrcodeNotifyAsync.class);
-			if (qrcodeNotifyAsync != null) {
-				QrcodePayNotifyDataAsync qrcodePayNotifyDataAsync = XmlUtils.toObject(
-						qrcodeNotifyAsync.getNotify_data(), QrcodePayNotifyDataAsync.class);
-				if (qrcodePayNotifyDataAsync != null) {
-					// 检查订单是否存在
-					BillingOrder billingOrder = billingOrderMapper.getByOrderId(qrcodePayNotifyDataAsync
-							.getOut_trade_no());
-					if (billingOrder == null) {
-						logger.error("订单不存在. params: " + qrcodeNotifyAsync.toString());
-					} else {
-						BillingAlipayAccount billingAlipayAccount = billingThirdpayAccountManager
-								.getAlipayAccount(billingOrder.getThirdpayAccountName());
-						if (billingAlipayAccount == null) {
-							logger.error("收款账号不存在. params: " + qrcodeNotifyAsync.toString());
-						} else {
-							boolean verifyOk = alipaySupport.verifyQrcodeSign(params, billingAlipayAccount);
-							if (verifyOk) {
-								AlipayTradeStatus tradeStatus = AlipayTradeStatus.getEnum(qrcodePayNotifyDataAsync
-										.getTrade_status());
-								// 支付成功
-								if (tradeStatus == AlipayTradeStatus.TRADE_SUCCESS
-										|| tradeStatus == AlipayTradeStatus.TRADE_FINISHED) {
-									Long payAmount = Long.valueOf(new DecimalFormat("#").format(BigDecimal
-											.valueOf(Double.valueOf(qrcodePayNotifyDataAsync.getTotal_fee()))
-											.multiply(BigDecimal.valueOf(100)).doubleValue()));
-									WanmeiPayNotify wanmeiPayNotify = thirdPayOrderSuccuss(
-											qrcodePayNotifyDataAsync.getTrade_no(), payAmount, "", billingOrder);
-									if (wanmeiPayNotify != null
-											&& wanmeiPayNotify.getWanmeiPayNotifyParams() != null
-											&& wanmeiPayNotify.getWanmeiPayNotifyParams().getPayResult() == PayConstant.SUCCESS) {
-										return AlipaySupport.RESPONSE_TO_ALIPAY_SUCCESS;
-									}
-								} else {
-									logger.error("网关支付失败. params: " + qrcodeNotifyAsync.toString());
-								}
-							} else {
-								logger.error("通知验证无效. params: " + qrcodeNotifyAsync.toString());
-							}
-						}
-					}
-				}
-			} else {
-				logger.error("通知参数有误. params: " + params.toString());
-			}
-			return AlipaySupport.RESPONSE_TO_ALIPAY_FAILED;
-		default:
+		} else {
 			logger.error("通知参数有误. params: " + params.toString());
-			return AlipaySupport.RESPONSE_TO_ALIPAY_FAILED;
 		}
+		return AlipaySupport.RESPONSE_TO_ALIPAY_FAILED;
 	}
 
+	/**
+	 * 处理支付成功的订单
+	 */
+	protected Map<String, String> thirdPayOrderSuccuss(String gatewayOrderId, Long realPayAmount, String payExtraInfo,
+			BillingHotel billingHotel) {
+		Long orderId = billingHotel.getId();
+		StringBuilder paramSb = new StringBuilder();
+		paramSb.append("orderId=").append(orderId).append(", gatewayOrderId=").append(gatewayOrderId)
+				.append(", realPayAmount=").append(realPayAmount).append(", payExtraInfo=").append(payExtraInfo);
+		if (StringUtils.isBlank(gatewayOrderId) || realPayAmount == null) {
+			logger.error("Some of param is null. params: " + paramSb.toString());
+			billingHotelMapper.updatePayFailedInfo(orderId, "支付流水号|支付金额为空. params: " + paramSb.toString());
+			return null;
+		}
+		// 检查订单是否已支付（重复通知）
+		if (billingHotel.getPayStatus().intValue() != 1) {
+			// 检查订单是否未支付
+			if (billingHotel.getPayStatus().intValue() != 0) {
+				logger.error("Order cannot be payed. params:" + paramSb.toString());
+				return null;
+			}
+
+			// 金额判断实际支付金额不能小于平台要求的支付金额
+			if (realPayAmount < billingHotel.getPayPrice()) {
+				logger.error("Wrong pay amount: order payAmount=" + billingHotel.getPayPrice() + ", revc: "
+						+ paramSb.toString());
+				billingHotelMapper.updatePayFailedInfo(orderId, "实际支付金额小于应支付金额. params: " + paramSb.toString());
+				return null;
+			}
+			// 更新订单状态
+			Integer result = billingHotelMapper.updatePayOk(gatewayOrderId, realPayAmount, orderId);
+			if (result == null || result != 1) {
+				logger.error("Update order's pay status failed. params: " + paramSb.toString());
+				billingHotelMapper.updatePayFailedInfo(orderId, "更新订单状态失败. params: " + paramSb.toString());
+				return null;
+			}
+		} else { // 重复通知(常发生于同步跟异步重复)
+			logger.warn("Order is payed, repeat nofify. params:" + paramSb.toString());
+		}
+		// 返回
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("payedOrderId", orderId.toString());
+		return map;
+	}
 }
