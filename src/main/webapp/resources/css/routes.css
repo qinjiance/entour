@@ -24,3 +24,7 @@
 .routeList>div .price p.collect:hover{background-color: #23BFFB;color: #fff;}
 .routeList>div .price p.detail{cursor:pointer;padding: 10px 5px; margin: 7px 0;background-color: #F7AD50;color: #fff;}
 .routeList>div .price p.detail:hover{background-color: #F7BB50;color: #fff;}
+
+.stars em.full{ background:url(../img/3.png) no-repeat; display:inline-block; width:28px; height:28px;}
+.stars em.half{ background:url(../img/2.png) no-repeat; display:inline-block; width:28px; height:28px;}
+.stars em.empty{ background:url(../img/1.png) no-repeat; display:inline-block; width:28px; height:28px; content:"<em class='full'></em>"}

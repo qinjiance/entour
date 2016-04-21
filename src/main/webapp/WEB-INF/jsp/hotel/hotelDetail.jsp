@@ -23,7 +23,7 @@
 				<c:when test="${holtelDet!=null}">
 					<div class="easyui-panel" data-options="border:false" style="margin:20px 0;padding:5px;background-color: inherit;">
 						<div class="til">
-							<p class="label"><span class="hotelName">${holtelDet.hotelName}</span><span class="starLevel"></span></p>
+							<p class="label"><span class="hotelName">${holtelDet.hotelName}</span><span class="stars ${holtelDet.starsLevel}stars"></span></p>
 							<p class="cat">${holtelDet.hotelCatalog}</p>
 							<p class="brandName">${holtelDet.brandName}</p>
 							<p class="address">${holtelDet.address}, ${holtelDet.country}</p>
@@ -155,6 +155,35 @@
 			myFocus.set({
 				id:'myFocus',//ID
 				pattern:'mF_fancy'//风格
+			});
+			var mytotalstar=5;
+			$(".stars").each(function(index, element) {
+		       var classs=$(this).get(0).className;
+			   var classArr=String(classs).split(" ");
+			   var starNum=0,i;
+			   var myhalf=false;
+			   
+			   
+			   for( i=0;i<classArr.length;i++){
+				  	if(classArr[i].indexOf("stars")>0){
+					     if(classArr[i].indexOf(".")>0)myhalf=true;
+						starNum=parseInt(classArr[i]);
+					     break;
+					  }
+				   }
+				var myhtml="";
+				var myemptyNum=mytotalstar-starNum;
+				for(i=0;i<starNum;i++){
+					myhtml+='<em class="full"></em>';
+					}
+				if(starNum){
+					myhtml+='<em class="half"></em>';
+					myemptyNum--;
+					}
+				for(i=0;i<myemptyNum;i++){
+					myhtml+='<em class="empty"></em>';
+					}
+				$(this).html(myhtml);
 			});
 		});
 	</script>

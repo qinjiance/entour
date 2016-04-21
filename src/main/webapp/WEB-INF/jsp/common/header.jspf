@@ -20,7 +20,7 @@ contentType="text/html; charset=utf-8"
 			</div>
 		<%	} else { 
 				String nickname = CookieUtil.getNicknameFromCookie();%>
-			<div class="carts"><a href="${ctx}/user/hotelOrder">我的订单</a></div>
+			<div class="carts"><a href="${ctx}/hotelOrder">我的订单</a></div>
 			<div id="logonTop" class="logined">
 				<div class="user">
 					<a id="nicknameTop" class="blue" href="${ctx}/user/userInfo"><%=nickname%><em></em></a>

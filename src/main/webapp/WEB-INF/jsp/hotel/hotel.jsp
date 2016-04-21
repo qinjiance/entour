@@ -179,7 +179,7 @@
 			<div class="small"><a class="hotelDet" href="${ctx}/" target="_blank">
 				<img class="thumbImg" src="" alt="Picture" /></a></div>
 			<div class="content">
-				<a class="label hotelDet" href="${ctx}/" target="_blank"><span class="hotelName"></span><span class="starLevel"></span></a>
+				<a class="label hotelDet" href="${ctx}/" target="_blank"><span class="hotelName"></span><span class="stars"></span></a>
 				<p class="cat"></p>
 				<p class="brandName"></p>
 				<p class="address"></p>
@@ -212,6 +212,35 @@
 	<%@include file="../common/scripts.jspf"%>
 	
 	<script type="text/javascript">
+	function initStars(){
+		var mytotalstar=5;
+		$(".stars").each(function(index, element) {
+	       var classs=$(this).get(0).className;
+		   var classArr=String(classs).split(" ");
+		   var starNum=0,i;
+		   var myhalf=false;
+		   for( i=0;i<classArr.length;i++){
+			  	if(classArr[i].indexOf("stars")>0){
+				     if(classArr[i].indexOf(".")>0)myhalf=true;
+					starNum=parseInt(classArr[i]);
+				     break;
+				  }
+			   }
+			var myhtml="";
+			var myemptyNum=mytotalstar-starNum;
+			for(i=0;i<starNum;i++){
+				myhtml+='<em class="full"></em>';
+				}
+			if(starNum){
+				myhtml+='<em class="half"></em>';
+				myemptyNum--;
+				}
+			for(i=0;i<myemptyNum;i++){
+				myhtml+='<em class="empty"></em>';
+				}
+			$(this).html(myhtml);
+		});
+	}
 	function changeStart(val,e){
 		$("input[name=searchStars]").val(val);
 		$('.stt').removeClass("on");
@@ -304,7 +333,7 @@
 									+"&checkOut="+$("input[name=checkOut]").val()
 									+"&roomInfo="+$("input[name=roomInfo]").val());
 							hotelDiv.find(".hotelName").html(e.hotelName);
-							hotelDiv.find(".starLevel").addClass(e.starsLevel+"stars");
+							hotelDiv.find(".stars").addClass(e.starsLevel+"stars");
 							hotelDiv.find(".brandName").html(e.brandName);
 							hotelDiv.find(".address").html(e.address);
 							hotelDiv.find(".roomTypes").html(e.roomTypes);
@@ -326,6 +355,7 @@
 							$(e).html(hotelCats[4-i]);
 						});
 					}
+					initStars();
 				}else{
 					$.messager.show({
 						title:'消息提示',

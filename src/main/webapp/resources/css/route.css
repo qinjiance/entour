@@ -78,3 +78,7 @@
 .rts .colu .rtname{color: #0065b8;font-weight: bold;font-size: 14px;margin-bottom: 10px;}
 .rts .colu .rtbed{color: #6b6b6b;font-weight: bold;font-size: 13px;margin-bottom: 2px;}
 .rts .colu .rtgues{color: #6b6b6b;font-weight: bold;font-size: 13px;margin-bottom: 2px;}
+
+.stars em.full{ background:url(../img/3.png) no-repeat; display:inline-block; width:28px; height:28px;}
+.stars em.half{ background:url(../img/2.png) no-repeat; display:inline-block; width:28px; height:28px;}
+.stars em.empty{ background:url(../img/1.png) no-repeat; display:inline-block; width:28px; height:28px; content:"<em class='full'></em>"}

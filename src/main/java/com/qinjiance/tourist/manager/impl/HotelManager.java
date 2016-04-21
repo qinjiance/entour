@@ -1246,4 +1246,27 @@ public class HotelManager implements IHotelManager {
 		map.put("payedOrderId", orderId.toString());
 		return map;
 	}
+
+	@Override
+	public List<BillingHotel> getBillingHotels(Long userId) throws ManagerException {
+		if (userId == null) {
+			throw new ManagerException("用户ID为空");
+		}
+		return billingHotelMapper.getByUserId(userId);
+	}
+
+	@Override
+	public BillingHotel getBillingHotel(Long userId, Long orderId) throws ManagerException {
+		if (userId == null) {
+			throw new ManagerException("用户ID为空");
+		}
+		if (orderId == null) {
+			throw new ManagerException("订单ID为空");
+		}
+		BillingHotel billingHotel = billingHotelMapper.getById(orderId);
+		if (billingHotel == null || billingHotel.getUserId() == null || !billingHotel.getUserId().equals(userId)) {
+			return null;
+		}
+		return billingHotel;
+	}
 }

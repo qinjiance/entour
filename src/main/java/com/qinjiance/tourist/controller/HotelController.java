@@ -6,6 +6,7 @@ import java.util.Map;
 
 import module.laohu.commons.model.ResponseResult;
 import module.laohu.commons.util.DateUtils;
+import module.laohu.commons.util.JsonUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,9 +17,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.qinjiance.tourist.annotation.NeedCookie;
 import com.qinjiance.tourist.constants.Constants;
+import com.qinjiance.tourist.constants.Currency;
 import com.qinjiance.tourist.manager.IDestinationManager;
 import com.qinjiance.tourist.manager.IHotelManager;
 import com.qinjiance.tourist.manager.exception.ManagerException;
+import com.qinjiance.tourist.model.po.BillingHotel;
+import com.qinjiance.tourist.model.vo.BookRoomInfo;
 import com.qinjiance.tourist.model.vo.DestinationVo;
 import com.qinjiance.tourist.model.vo.HoltelDetPrice;
 import com.qinjiance.tourist.model.vo.HoltelDetVo;
@@ -67,6 +71,47 @@ public class HotelController extends BaseTouristController {
 		model.put("roomInfo", roomInfo);
 
 		return "hotel/hotel";
+	}
+
+	/**
+	 * @return
+	 */
+	@NeedCookie
+	@RequestMapping(value = "/hotelOrder")
+	public String hotelOrder(ModelMap model) {
+		try {
+			List<BillingHotel> ret = hotelManager.getBillingHotels(CookieUtil.getUserIdFromCookie());
+			model.put("holtels", ret);
+		} catch (ManagerException e) {
+			logger.error("ManagerException: ", e);
+		}
+
+		return "user/hotelOrder";
+	}
+
+	/**
+	 * @return
+	 */
+	@NeedCookie
+	@RequestMapping(value = "/hotelOrderDet")
+	public String hotelOrderDet(@RequestParam Long orderId, ModelMap model) {
+		try {
+			BillingHotel ret = hotelManager.getBillingHotel(CookieUtil.getUserIdFromCookie(), orderId);
+			if (ret != null) {
+				List<BookRoomInfo> bookRoomInfos = JsonUtils.parseToList(ret.getRoomInfos(), BookRoomInfo.class);
+				model.put("rooms", bookRoomInfos);
+
+				Currency origCurrency = Currency.getEnum(ret.getCurrency());
+				Currency payCurrency = Currency.getEnum(ret.getPayCurrency());
+				model.put("origCurrency", origCurrency);
+				model.put("payCurrency", payCurrency);
+			}
+			model.put("holtel", ret);
+		} catch (ManagerException e) {
+			logger.error("ManagerException: ", e);
+		}
+
+		return "hotel/hotelBill";
 	}
 
 	/**

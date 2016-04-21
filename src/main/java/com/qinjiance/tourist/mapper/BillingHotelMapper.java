@@ -1,5 +1,7 @@
 package com.qinjiance.tourist.mapper;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -34,4 +36,7 @@ public interface BillingHotelMapper {
 
 	@Select("select * from billing_hotel where id = #{id}")
 	public BillingHotel getById(@Param("id") Long id);
+
+	@Select("select * from billing_hotel where user_id = #{userId} order by create_time desc")
+	public List<BillingHotel> getByUserId(@Param("userId") Long userId);
 }

@@ -8,12 +8,12 @@
 		<a class="${left==1?'on':''}" href="${ctx}/user/chPwd">修改密码</a>
 	</p>
 	<p>
-		<a class="${left==2?'on':''}" href="${ctx}/user/hotelOrder">我的酒店</a>
+		<a class="${left==2?'on':''}" href="${ctx}/hotelOrder">我的酒店</a>
 	</p>
 	<p>
-		<a class="${left==3?'on':''}" href="${ctx}/user/cartOrder">我的租车</a>
+		<a class="${left==3?'on':''}" href="${ctx}/cartOrder">我的租车</a>
 	</p>
 	<p>
-		<a class="${left==4?'on':''}" href="${ctx}/user/actOrder">我的活动</a>
+		<a class="${left==4?'on':''}" href="${ctx}/actOrder">我的活动</a>
 	</p>
 </div>

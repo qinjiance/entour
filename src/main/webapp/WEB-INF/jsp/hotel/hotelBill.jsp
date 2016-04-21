@@ -4,13 +4,13 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title><fmt:message key="webapp.title" /> - 付款</title>
+<title><fmt:message key="webapp.title" /> - 订单详情</title>
 <!-- meta -->
 <%@include file="../common/meta.jspf"%>
 <!-- css links -->
 <%@include file="../common/links.jspf"%>
 <link rel="stylesheet" type="text/css"
-	href="${ctx}<fmt:message key="static.resources.host"/>/css/book.css" />
+	href="${ctx}<fmt:message key="static.resources.host"/>/css/bookDet.css" />
 </head>
 <body>
 	<!-- header -->
@@ -22,41 +22,29 @@
 		<div class="xbody">
 				<div class="myleft">
 					<div class="easyui-panel" data-options="border:false" style="margin:0;padding:10px;background-color: #fff;">
-						<div class="til">
-							<p class="titt">旅客信息</p>
-							<p class="tip">请输入办理入住手续的住客姓名。年龄必须为 18 岁或以上。</p>
-							<p class="tipp">联系人姓名只能使用英文。</p>
-						</div>
-						<hr />
-						<c:forEach items="${holtelDetPrice.roomType.roomPrices}" var="room" varStatus="vs">
-							<div class="room" roomId="${room.roomId}">
+						<c:forEach items="${rooms}" var="room" varStatus="vs">
+							<div class="room">
 								<div class="lab"><span>客房${room.roomId}:&nbsp;</span>${room.adultNum}位成人,&nbsp;${(room.childNum==0)?'':(room.childNum)}${(room.childNum==0)?'':'儿童,&nbsp;'}
-									<select name="bedding">
-									<c:forEach items="${room.occupancyVos}" var="occup" varStatus="occvs">
-										<option ${(occvs.index==0)?'checked="checked"':''} value="${occup.occuId}">${occup.bedNum}张${(occup.bedType==1)?'单':((occup.bedType==2)?'双':(occup.bedType))}人床</option>
+									<c:if test="${! empty room.childAges}">
+									<span>
+									<c:forEach items="${room.childAges}" var="age" varStatus="agevs">
+										${(agevs.index>0)?", ":""}${age}
 									</c:forEach>
-									</select>
+									</span>
+									</c:if>
+									<span>${fn:split(room.bedding,",")[1]}张床</span>
 								</div>
-								<c:forEach items="${room.occupancyVos}" var="occup" varStatus="occvs">
-									<div class="colu" occPrice="${occup.occuPubPrice}" occId="${occup.occuId}" 
-										bedding="${occup.bedding}" style="${(occvs.index==0)?'':'display:none;'}">
-										<p>
-											<c:forEach items="${occup.boardbases}" var="bob" varStatus="bobvs">
-												<input id="bob${bobvs.index}" name="bob" value="${bob.bbId}" bobPrice="${bob.bbPublishPrice}"
-													type="radio" ${(bob.bbPublishPrice=='0'||bob.bbPublishPrice=='0.00')?'checked="checked"':''} />
-												<label for="bob${bobvs.index}">${bob.bbName}(<span class="fee">${(bob.bbPublishPrice=='0'||bob.bbPublishPrice=='0.00')?'免费':'预付'}${(bob.bbPublishPrice=='0'||bob.bbPublishPrice=='0.00')?'':(holtelDetPrice.currencySymbol)}${(bob.bbPublishPrice=='0'||bob.bbPublishPrice=='0.00')?'':(bob.bbPublishPrice)}</span>)</label>
-											</c:forEach>
-										</p>
-										<p>
-											<c:forEach items="${occup.supplements}" var="supp" varStatus="suppvs">
-												<input id="supp${suppvs.index}" name="supp" value="${supp.suppId}" suppPrice="${supp.publishPrice}" suppChargeType="supp.suppChargeType"
-													type="checkbox" ${(supp.suppIsMandatory==true)?'checked="checked" disabled="disabled"':((supp.suppChargeType==1||supp.publishPrice=='0'||supp.publishPrice=='0.00')?'checked="checked"':'')} />
-												<label for="supp${suppvs.index}">${supp.suppName}(<span class="fee">${(supp.suppChargeType==1||supp.publishPrice=='0'||supp.publishPrice=='0.00')?'免费':((supp.suppChargeType==2)?'预付':'到付')}${(supp.suppChargeType==1||supp.publishPrice=='0'||supp.publishPrice=='0.00')?'':(holtelDetPrice.currencySymbol)}${(supp.suppChargeType==1||supp.publishPrice=='0'||supp.publishPrice=='0.00')?'':(supp.publishPrice)}</span>)</label>
-											</c:forEach>
-										</p>
-									</div>
-								</c:forEach>
-								<p class="inp"><label for="firstname">联系人姓<span>*</span>&nbsp;</label><input placeholder="请输入英文姓名" id="firstname" name="firstname" class="easyui-validatebox" data-options="required:true,validType:'alphabet'" style="width:150px" />
+								<div class="colu">
+									<p>
+										<span>${room.boadBase.name}(<span class="fee">${(room.boadBase.price=='0'||room.boadBase.price=='0.00')?'免费':'预付'}${(room.boadBase.price=='0'||room.boadBase.price=='0.00')?'':(origCurrency.symbol)}${(room.boadBase.price=='0'||room.boadBase.price=='0.00')?'':(room.boadBase.price)}</span>)</span>
+									</p>
+									<p>
+										<c:forEach items="${room.supplements}" var="supp" varStatus="suppvs">
+											<span>${supp.suppName}(<span class="fee">${(supp.suppChargeType==1||supp.publishPrice=='0'||supp.publishPrice=='0.00')?'免费':((supp.suppChargeType==2)?'预付':'到付')}${(supp.suppChargeType==1||supp.publishPrice=='0'||supp.publishPrice=='0.00')?'':(origCurrency.symbol)}${(supp.suppChargeType==1||supp.publishPrice=='0'||supp.publishPrice=='0.00')?'':(supp.publishPrice)}</span>)</span>
+										</c:forEach>
+									</p>
+								</div>
+								<p class="inp"><span for="firstname">联系人姓<span>*</span>&nbsp;</span>${}
 									<label for="lastname">联系人名<span>*</span>&nbsp;</label><input placeholder="请输入英文姓名" id="lastname" name="lastname" class="easyui-validatebox" data-options="required:true,validType:'alphabet'" style="width:150px" /></p>
 								<p class="inp"><label for="phone">联系人手机<span>*</span>&nbsp;</label>
 									<select name="ccode">
