@@ -768,9 +768,10 @@ public class HotelManager implements IHotelManager {
 	}
 
 	@Override
-	public String prePay(Long orderId, Integer hotelId, Date checkIn, Date checkOut, String hotelBookRoomInfosStr,
-			String roomInfo, Integer hotelRoomTypeId, String confirmEmail, Integer payTypeId, Long totalDaofu,
-			Long totalYufu, Long userId, String bookCurrency) throws ManagerException {
+	public Map<String, String> prePay(Long orderId, Integer hotelId, Date checkIn, Date checkOut,
+			String hotelBookRoomInfosStr, String roomInfo, Integer hotelRoomTypeId, String confirmEmail,
+			Integer payTypeId, Long totalDaofu, Long totalYufu, Long userId, String bookCurrency)
+			throws ManagerException {
 		if (hotelId == null) {
 			throw new ManagerException("未选择酒店，请选择");
 		}
@@ -1029,7 +1030,10 @@ public class HotelManager implements IHotelManager {
 		if (StringUtils.isBlank(payUri)) {
 			throw new ManagerException("打开支付失败，请稍后再试");
 		}
-		return payUri;
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("orderId", orderId.toString());
+		map.put("payUri", payUri);
+		return map;
 	}
 
 	@Override
@@ -1218,6 +1222,27 @@ public class HotelManager implements IHotelManager {
 		}
 		// 返回
 		Map<String, String> map = new HashMap<String, String>();
+		map.put("payedOrderId", orderId.toString());
+		return map;
+	}
+
+	@Override
+	public Map<String, String> queryUserOrderStatus(Long userId, Long orderId) throws ManagerException {
+		if (orderId == null) {
+			throw new ManagerException("订单ID为空");
+		}
+		BillingHotel billingHotel = billingHotelMapper.getById(orderId);
+		if (billingHotel == null) {
+			throw new ManagerException("订单不存在");
+		}
+		if (userId.longValue() != billingHotel.getUserId().longValue()) {
+			throw new ManagerException("您的订单不存在");
+		}
+
+		// 返回结果
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("payStatus", billingHotel.getPayStatus().toString());
+		map.put("chargeStatus", billingHotel.getChargeStatus().toString());
 		map.put("payedOrderId", orderId.toString());
 		return map;
 	}

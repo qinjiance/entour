@@ -162,7 +162,15 @@
         <a href="javascript:void(0)" class="easyui-linkbutton nopay">取消支付</a>
     </div>
     
+	<div id="error" title="预定提示" class="easyui-dialog" data-options="buttons:'#bb2',modal:true,width:400,height:200,closed:true,draggable:false,resizable:false" style="text-align: center;font-size: 18px;">
+		<p class="msg1">出错了</p>
+	</div>
+    <div id="bb2">
+        <a href="javascript:void(0)" class="easyui-linkbutton errorclose">确定</a>
+    </div>
+    
 	<form id="hotelPrepay" action="${ctx}/hotelPrepay">
+		<input type="hidden" name="orderId" value="${orderId}" />
 		<input type="hidden" name="hotelId" value="${hotelId}" />
 		<input type="hidden" name="checkIn" value="${checkIn}" />
 		<input type="hidden" name="checkOut" value="${checkOut}" />
@@ -183,6 +191,97 @@
 		src="${ctx}<fmt:message key="static.resources.host"/>/js/myfocus/myfocus-2.0.4.min.js"></script>
 	
 	<script type="text/javascript">
+		function checkResult() {
+			var orderId = $("input[name=orderId]").val();
+			if (orderId == '') {
+				return false;
+			}
+			$.ajax({
+			    type: 'get',
+			    url: '${ctx}queryCurrUserOrderStatus',
+			    data: {
+					orderId : orderId
+				},
+			    success: function(ret) {
+			    	if (ret.code != 0) {
+						$("#error .msg1").html(ret.message);
+						$('#error').dialog({
+							closed:false,
+							style:{
+								right:'',
+								top:document.body.scrollTop+document.documentElement.scrollTop,
+								bottom:''
+							}
+						});
+					} else {
+						ret = ret.result;
+						if (ret.payStatus == '99') {
+							$("#error .msg1").html("支付失败，请稍后再试！");
+							$('#error').dialog({
+								closed:false,
+								style:{
+									right:'',
+									top:document.body.scrollTop+document.documentElement.scrollTop,
+									bottom:''
+								}
+							});
+						} else if (ret.payStatus == '1') {
+							if (ret.chargeStatus == '2') {
+								$("#error .msg1").html("订单正在处理中，请稍后到账户内查询详情。");
+								$('#error').dialog({
+									closed:false,
+									style:{
+										right:'',
+										top:document.body.scrollTop+document.documentElement.scrollTop,
+										bottom:''
+									}
+								});
+							} else if (ret.chargeStatus == '1') {
+								$("#error .msg1").html("恭喜您，预定成功。");
+								$('#error').dialog({
+									closed:false,
+									style:{
+										right:'',
+										top:document.body.scrollTop+document.documentElement.scrollTop,
+										bottom:''
+									}
+								});
+							} else if (ret.chargeStatus == '99') {
+								$("#error .msg1").html("预定失败，请联系客服！");
+								$('#error').dialog({
+									closed:false,
+									style:{
+										right:'',
+										top:document.body.scrollTop+document.documentElement.scrollTop,
+										bottom:''
+									}
+								});
+							} else {
+								$("#error .msg1").html("订单正在处理中，请稍后到账户内查询详情。");
+								$('#error').dialog({
+									closed:false,
+									style:{
+										right:'',
+										top:document.body.scrollTop+document.documentElement.scrollTop,
+										bottom:''
+									}
+								});
+							}
+						} else {
+							$("#error .msg1").html("由于网络原因暂无法确认订单状态，请稍后到账户内查询详情。");
+							$('#error').dialog({
+								closed:false,
+								style:{
+									right:'',
+									top:document.body.scrollTop+document.documentElement.scrollTop,
+									bottom:''
+								}
+							});
+						}
+					}
+			    }
+			});
+		}
 		function prepay(payTypeId){
 			if(!$("#inp").form("validate")){
 				return;
@@ -251,8 +350,9 @@
 			    data: data,
 			    success: function(ret) {
 			    	if(ret.code==0){
+			    		$("input[name=orderId]").val(ret.result.orderId);
 			    		$("#topay .mon").html('${holtelDetPrice.currencySymbol}'+$(".yufutt").html());
-						$("#bb a").attr("href",ret.result);
+						$("#bb a").attr("href",ret.result.payUri);
 						$('#topay').dialog({
 							closed:false,
 							style:{
@@ -401,6 +501,13 @@
 			});
 			$(".nopay").click(function(){
 				window.location.reload();
+			});
+			$(".payed").click(function(){
+				checkResult();
+			});
+			$(".errorclose").click(function(){
+				$('#error').dialog('close');
+				window.location.href = '${ctx}/user/hotelOrder';
 			});
 		});
 	</script>

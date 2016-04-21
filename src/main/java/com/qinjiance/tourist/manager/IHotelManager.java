@@ -32,7 +32,7 @@ public interface IHotelManager {
 	HoltelDetPrice checkAvailabilityAndPrice(Integer hotelId, Date checkIn, Date checkOut, String roomInfo,
 			Integer hotelRoomTypeId) throws ManagerException;
 
-	String prePay(Long orderId, Integer hotelId, Date checkIn, Date checkOut, String hotelBookRoomInfosStr,
+	Map<String,String> prePay(Long orderId, Integer hotelId, Date checkIn, Date checkOut, String hotelBookRoomInfosStr,
 			String roomInfo, Integer hotelRoomTypeId, String confirmEmail, Integer payTypeId, Long totalDaofu,
 			Long totalYufu, Long userId, String bookCurrency) throws ManagerException;
 
@@ -52,4 +52,6 @@ public interface IHotelManager {
 	 * @return
 	 */
 	public Map<String, String> handleAlipaySyncNotify(Map<String, String> params);
+
+	Map<String, String> queryUserOrderStatus(Long userId, Long orderId) throws ManagerException;
 }

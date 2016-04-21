@@ -2,6 +2,7 @@ package com.qinjiance.tourist.controller;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import module.laohu.commons.model.ResponseResult;
 import module.laohu.commons.util.DateUtils;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.qinjiance.tourist.annotation.NeedCookie;
 import com.qinjiance.tourist.constants.Constants;
 import com.qinjiance.tourist.manager.IDestinationManager;
 import com.qinjiance.tourist.manager.IHotelManager;
@@ -107,6 +109,7 @@ public class HotelController extends BaseTouristController {
 		return "hotel/hotelDetail";
 	}
 
+	@NeedCookie
 	@RequestMapping(value = "/hotelPreorder")
 	public String hotelPreorder(@RequestParam Integer hotelId, @RequestParam Date checkIn, @RequestParam Date checkOut,
 			@RequestParam String roomInfo, @RequestParam Integer hotelRoomTypeId, ModelMap model) {
@@ -131,21 +134,43 @@ public class HotelController extends BaseTouristController {
 	/**
 	 * @return
 	 */
+	@NeedCookie
 	@RequestMapping(value = "/hotelPrepay")
 	@ResponseBody
-	public ResponseResult<String> hotelPrepay(Long orderId, @RequestParam Integer hotelId,
+	public ResponseResult<Map<String, String>> hotelPrepay(Long orderId, @RequestParam Integer hotelId,
 			@RequestParam Date checkIn, @RequestParam Date checkOut, @RequestParam String hotelBookRoomInfosStr,
 			@RequestParam String roomInfo, @RequestParam Integer hotelRoomTypeId, @RequestParam String confirmEmail,
 			@RequestParam Integer payTypeId, @RequestParam Long totalDaofu, @RequestParam Long totalYufu,
 			@RequestParam String bookCurrency) {
-		ResponseResult<String> rr = new ResponseResult<String>();
+		ResponseResult<Map<String, String>> rr = new ResponseResult<Map<String, String>>();
 		rr.setCode(Constants.CODE_FAIL);
 		try {
-			String ret = hotelManager.prePay(orderId, hotelId, checkIn, checkOut, hotelBookRoomInfosStr, roomInfo,
-					hotelRoomTypeId, confirmEmail, payTypeId, totalDaofu, totalYufu, CookieUtil.getUserIdFromCookie(),
-					bookCurrency);
+			Map<String, String> ret = hotelManager.prePay(orderId, hotelId, checkIn, checkOut, hotelBookRoomInfosStr,
+					roomInfo, hotelRoomTypeId, confirmEmail, payTypeId, totalDaofu, totalYufu,
+					CookieUtil.getUserIdFromCookie(), bookCurrency);
 			rr.setCode(Constants.CODE_SUCC);
 			rr.setResult(ret);
+		} catch (ManagerException e) {
+			rr.setMessage(e.getMessage());
+		}
+		return rr;
+	}
+
+	/**
+	 * 查询我的单个订单状态
+	 */
+	@NeedCookie
+	@RequestMapping(value = "/queryCurrUserOrderStatus")
+	@ResponseBody
+	public ResponseResult<Map<String, String>> queryCurrUserOrderStatus(@RequestParam Long orderId) {
+		ResponseResult<Map<String, String>> rr = new ResponseResult<Map<String, String>>();
+		rr.setCode(Constants.CODE_FAIL);
+		try {
+			Map<String, String> result = hotelManager.queryUserOrderStatus(CookieUtil.getUserIdFromCookie(), orderId);
+			if (result != null && !result.isEmpty()) {
+				rr.setCode(Constants.CODE_SUCC);
+				rr.setResult(result);
+			}
 		} catch (ManagerException e) {
 			rr.setMessage(e.getMessage());
 		}

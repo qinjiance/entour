@@ -36,7 +36,7 @@ public final class CookieUtil {
 	/**
 	 * ARC Games cookie域
 	 */
-	public static final String DOMAIN = ".my3w.com";
+	public static final String DOMAIN = "localhost";
 	public static final String PATH = "/";
 
 	public static final int COOKIE_CLEAR = 0;
