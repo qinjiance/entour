@@ -44,15 +44,9 @@
 										</c:forEach>
 									</p>
 								</div>
-								<p class="inp"><span for="firstname">联系人姓<span>*</span>&nbsp;</span>${}
-									<label for="lastname">联系人名<span>*</span>&nbsp;</label><input placeholder="请输入英文姓名" id="lastname" name="lastname" class="easyui-validatebox" data-options="required:true,validType:'alphabet'" style="width:150px" /></p>
-								<p class="inp"><label for="phone">联系人手机<span>*</span>&nbsp;</label>
-									<select name="ccode">
-	                                    <%@include file="../common/phonecountry.jspf"%>
-									</select>
-									-
-									<input placeholder="方便酒店与您联系" id="phone" name="phone" class="easyui-validatebox" data-options="required:true,validType:'number'" style="width:150px" />
-								</p>
+								<p class="inp"><span>联系人姓<span>*</span>&nbsp;</span>${room.contactPassenger.firstname}
+									<span>联系人名<span>*</span>&nbsp;</span>${room.contactPassenger.lastname}</p>
+								<p class="inp"><span for="phone">联系人手机<span>*</span>&nbsp;</span>${room.contactPassenger.mobilephone}</p>
 							</div> 
 							<c:if test="${vs.last==false}">
 								<hr />
