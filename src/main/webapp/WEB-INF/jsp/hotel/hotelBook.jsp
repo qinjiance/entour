@@ -56,8 +56,8 @@
 										</p>
 									</div>
 								</c:forEach>
-								<p class="inp"><label for="firstname">联系人姓<span>*</span>&nbsp;</label><input placeholder="请输入英文姓名" id="firstname" name="firstname" class="easyui-validatebox" data-options="required:true,validType:'alphabet'" style="width:150px" />
-									<label for="lastname">联系人名<span>*</span>&nbsp;</label><input placeholder="请输入英文姓名" id="lastname" name="lastname" class="easyui-validatebox" data-options="required:true,validType:'alphabet'" style="width:150px" /></p>
+								<p class="inp"><label for="lastname">联系人姓<span>*</span>&nbsp;</label><input placeholder="请输入英文姓名" id="lastname" name="lastname" class="easyui-validatebox" data-options="required:true,validType:'alphabet'" style="width:150px" />
+									<label for="firstname">联系人名<span>*</span>&nbsp;</label><input placeholder="请输入英文姓名" id="firstname" name="firstname" class="easyui-validatebox" data-options="required:true,validType:'alphabet'" style="width:150px" /></p>
 								<p class="inp"><label for="phone">联系人手机<span>*</span>&nbsp;</label>
 									<select name="ccode">
 	                                    <%@include file="../common/phonecountry.jspf"%>
@@ -176,7 +176,7 @@
 		<input type="hidden" name="checkOut" value="${checkOut}" />
 		<input type="hidden" name="roomInfo" value="${roomInfo}" />
 		<input type="hidden" name="hotelRoomTypeId" value="${hotelRoomTypeId}" />
-		<input type="hidden" name="hotelBookRoomInfosStr" value="${hotelBookRoomInfosStr}" />
+		<input type="hidden" name="hotelBookRoomInfosStr" value="" />
 		<input type="hidden" name="bookCurrency" value="${holtelDetPrice.currency}" />
 		<input type="hidden" name="totalYufu" value="" />
 		<input type="hidden" name="totalDaofu" value="" />
@@ -428,14 +428,14 @@
 				hotelBookRoomInfo.suppIds=suppIds;
 				hotelBookRoomInfo.firstname=$(this).find("input[name=firstname]").val();
 				hotelBookRoomInfo.lastname=$(this).find("input[name=lastname]").val();
-				hotelBookRoomInfo.phonenumber=$(this).find("select[name=ccode]").val()+"-"+$(this).find("input[name=phone]").val();
+				hotelBookRoomInfo.phonenumber="("+$(this).find("select[name=ccode]").val()+")"+$(this).find("input[name=phone]").val();
 				hotelBookRoomInfos.push(hotelBookRoomInfo);
 			});
 			$("input[name=hotelBookRoomInfosStr]").val(stringToHex(JSON.stringify(hotelBookRoomInfos)));
 			
-			$(".yufutt").html(sum);
+			$(".yufutt").html(sum.toFixed(2));
 			$("input[name=totalYufu]").val((Number(sum)*100).toFixed(0));
-			$(".daofutt").html(daofuSum);
+			$(".daofutt").html(daofuSum.toFixed(2));
 			$("input[name=totalDaofu]").val((Number(daofuSum)*100).toFixed(0));
 		}
 		$(document).ready(function(){
@@ -530,6 +530,7 @@
 				window.location.reload();
 			});
 			$(".payed").click(function(){
+				$('#paying').dialog("close");
 				checkResult();
 			});
 			$(".errorclose").click(function(){

@@ -34,10 +34,11 @@ public interface IHotelManager {
 	HoltelDetPrice checkAvailabilityAndPrice(Integer hotelId, Date checkIn, Date checkOut, String roomInfo,
 			Integer hotelRoomTypeId) throws ManagerException;
 
-	Map<String, String> prePay(Long orderId, Integer hotelId, Date checkIn, Date checkOut,
-			String hotelBookRoomInfosStr, String roomInfo, Integer hotelRoomTypeId, String confirmEmail,
-			Integer payTypeId, Long totalDaofu, Long totalYufu, Long userId, String bookCurrency)
-			throws ManagerException;
+	Map<String, String> prePay(Integer hotelId, Date checkIn, Date checkOut, String hotelBookRoomInfosStr,
+			String roomInfo, Integer hotelRoomTypeId, String confirmEmail, Integer payTypeId, Long totalDaofu,
+			Long totalYufu, Long userId, String bookCurrency) throws ManagerException;
+
+	Map<String, String> rePay(Long orderId, Integer payTypeId, Long userId) throws ManagerException;
 
 	String getThirdPayUrl(PayType PayType, String orderId, Long payAmount, String subject, String description)
 			throws ManagerException;

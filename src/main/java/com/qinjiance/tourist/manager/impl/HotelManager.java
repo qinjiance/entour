@@ -768,10 +768,9 @@ public class HotelManager implements IHotelManager {
 	}
 
 	@Override
-	public Map<String, String> prePay(Long orderId, Integer hotelId, Date checkIn, Date checkOut,
-			String hotelBookRoomInfosStr, String roomInfo, Integer hotelRoomTypeId, String confirmEmail,
-			Integer payTypeId, Long totalDaofu, Long totalYufu, Long userId, String bookCurrency)
-			throws ManagerException {
+	public Map<String, String> prePay(Integer hotelId, Date checkIn, Date checkOut, String hotelBookRoomInfosStr,
+			String roomInfo, Integer hotelRoomTypeId, String confirmEmail, Integer payTypeId, Long totalDaofu,
+			Long totalYufu, Long userId, String bookCurrency) throws ManagerException {
 		if (hotelId == null) {
 			throw new ManagerException("未选择酒店，请选择");
 		}
@@ -970,61 +969,202 @@ public class HotelManager implements IHotelManager {
 		String desc = holtelDetPrice.getHotelName() + "-" + holtelDetPrice.getRoomType().getName() + "-"
 				+ hotelBookRoomInfos.size() + "间房-" + holtelDetPrice.getRoomType().getNights() + "晚";
 		BillingHotel billingHotel = null;
+		Long orderId = orderIdSeqGenerater.nextLongValue();
+		// 新建订单
+		billingHotel = new BillingHotel();
+		billingHotel.setId(orderId);
+		billingHotel.setChargeStatus(0);
+		billingHotel.setConfirmationEmail(confirmEmail);
+		billingHotel.setConfirmationLogo("");
+		billingHotel.setRoomInfo(roomInfo);
+		billingHotel.setContactInfo(confirmEmail);
+		billingHotel.setCurrency(holtelDetPrice.getCurrency());
+		billingHotel.setPayCurrency(Currency.CNY.getName());
+		billingHotel.setDeltaPrice(0);
+		billingHotel.setHotelAddress(holtelDetPrice.getAddress());
+		billingHotel.setHotelCity(holtelDetPrice.getCity());
+		billingHotel.setHotelCountry(holtelDetPrice.getCountry());
+		billingHotel.setHotelId(hotelId);
+		billingHotel.setHotelName(holtelDetPrice.getHotelName());
+		billingHotel.setIsOnlyAvailable(true);
+		billingHotel.setPaymentType("Obligo");
+		billingHotel.setCheckIn(checkIn);
+		billingHotel.setCheckOut(checkOut);
+		billingHotel.setPayStatus(0);
+		billingHotel.setPayType(payType.getPayType());
+		billingHotel.setPrice(totalYufu);
+		billingHotel.setPayPrice(payYufu);
+		billingHotel.setPriceAtproperty(totalDaofu);
+		billingHotel.setPayPriceAtproperty(payDaofu);
+		billingHotel.setExchange(exchange.getExchange());
+		billingHotel.setRoomInfos(JsonUtils.objectToJson(bookRoomInfos));
+		billingHotel.setRoomNum(bookRoomInfos.size());
+		billingHotel.setRoomType(holtelDetPrice.getRoomType().getName());
+		billingHotel.setRoomTypeId(hotelRoomTypeId);
+		billingHotel.setUserId(userId);
+		billingHotel.setUsername(username);
+		Integer result = billingHotelMapper.insert(billingHotel);
+		if (result == null || result != 1) {
+			throw new ManagerException("订单创建失败");
+		}
+		String payUri = getThirdPayUrl(payType, orderId.toString(), payYufu, subject, desc);
+		if (StringUtils.isBlank(payUri)) {
+			throw new ManagerException("打开支付失败，请稍后再试");
+		}
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("orderId", orderId.toString());
+		map.put("payUri", payUri);
+		return map;
+	}
+
+	@Override
+	public Map<String, String> rePay(Long orderId, Integer payTypeId, Long userId) throws ManagerException {
 		if (orderId == null) {
-			orderId = orderIdSeqGenerater.nextLongValue();
-			// 新建订单
-			billingHotel = new BillingHotel();
-			billingHotel.setId(orderId);
-			billingHotel.setChargeStatus(0);
-			billingHotel.setConfirmationEmail(confirmEmail);
-			billingHotel.setConfirmationLogo("");
-			billingHotel.setContactInfo(confirmEmail);
-			billingHotel.setCurrency(holtelDetPrice.getCurrency());
-			billingHotel.setPayCurrency(Currency.CNY.getName());
-			billingHotel.setDeltaPrice(0);
-			billingHotel.setHotelAddress(holtelDetPrice.getAddress());
-			billingHotel.setHotelCity(holtelDetPrice.getCity());
-			billingHotel.setHotelCountry(holtelDetPrice.getCountry());
-			billingHotel.setHotelId(hotelId);
-			billingHotel.setHotelName(holtelDetPrice.getHotelName());
-			billingHotel.setIsOnlyAvailable(true);
-			billingHotel.setPaymentType("Obligo");
-			billingHotel.setCheckIn(checkIn);
-			billingHotel.setCheckOut(checkOut);
-			billingHotel.setPayStatus(0);
-			billingHotel.setPayType(payType.getPayType());
-			billingHotel.setPrice(totalYufu);
-			billingHotel.setPayPrice(payYufu);
-			billingHotel.setPriceAtproperty(totalDaofu);
-			billingHotel.setPayPriceAtproperty(payDaofu);
-			billingHotel.setExchange(exchange.getExchange());
-			billingHotel.setRoomInfos(JsonUtils.objectToJson(bookRoomInfos));
-			billingHotel.setRoomNum(roomInfo);
-			billingHotel.setRoomType(holtelDetPrice.getRoomType().getName());
-			billingHotel.setRoomTypeId(hotelRoomTypeId);
-			billingHotel.setUserId(userId);
-			billingHotel.setUsername(username);
-			Integer result = billingHotelMapper.insert(billingHotel);
-			if (result == null || result != 1) {
-				throw new ManagerException("订单创建失败");
+			throw new ManagerException("未选择订单，请选择");
+		}
+		// 支付旧订单
+		BillingHotel billingHotel = billingHotelMapper.getById(orderId);
+		if (billingHotel == null) {
+			throw new ManagerException("该订单不存在");
+		}
+		if (userId == null || billingHotel.getUserId() == null || !billingHotel.getUserId().equals(userId)) {
+			throw new ManagerException("您的订单不存在");
+		}
+		if (billingHotel.getPayStatus().intValue() != 0 || billingHotel.getChargeStatus().intValue() != 0) {
+			throw new ManagerException("该订单已完成支付");
+		}
+		List<BookRoomInfo> hotelBookRoomInfos = JsonUtils.parseToList(billingHotel.getRoomInfos(), BookRoomInfo.class);
+		if (hotelBookRoomInfos == null || hotelBookRoomInfos.isEmpty()) {
+			throw new ManagerException("该房型已不可预定，请重新查询酒店房型(err=0)");
+		}
+		HoltelDetPrice holtelDetPrice = checkAvailabilityAndPrice(billingHotel.getHotelId(), billingHotel.getCheckIn(),
+				billingHotel.getCheckOut(), billingHotel.getRoomInfo(), billingHotel.getRoomTypeId());
+		if (holtelDetPrice == null) {
+			throw new ManagerException("该房型已不可预定，请重新查询酒店房型(err=1)");
+		}
+		if (!holtelDetPrice.getCurrency().equalsIgnoreCase(billingHotel.getCurrency())) {
+			throw new ManagerException("货币类型变化，请重新查询酒店房型");
+		}
+		PayType payType = PayType.getEnum(payTypeId);
+		if (payType == null) {
+			throw new ManagerException("支付方式不可用，请重新选择支付方式");
+		}
+		List<RoomPrice> roomPrices = holtelDetPrice.getRoomType().getRoomPrices();
+		if (roomPrices == null || roomPrices.isEmpty()) {
+			throw new ManagerException("该房型已不可预定，请重新查询酒店房型(err=2)");
+		}
+		Map<Integer, RoomPrice> roomPriceMap = new HashMap<Integer, RoomPrice>();
+		for (RoomPrice roomPrice : roomPrices) {
+			roomPriceMap.put(roomPrice.getRoomId(), roomPrice);
+		}
+		RoomPrice roomPrice = null;
+		Long totalRoomDaofu = 0L;
+		Long totalRoomYufu = 0L;
+		Long roomDaofu = 0L;
+		Long roomYufu = 0L;
+		OccupancyVo occu = null;
+		Map<Integer, BoardbasePrice> boardbasePriceMap = new HashMap<Integer, BoardbasePrice>();
+		BoardbasePrice bb = null;
+		Map<Integer, SupplementPrice> supplementPriceMap = new HashMap<Integer, SupplementPrice>();
+		SupplementPrice supp = null;
+		List<BookRoomSupplement> supplements = null;
+		BookRoomSupplement supplement = null;
+		for (BookRoomInfo hotelBookRoomInfo : hotelBookRoomInfos) {
+			roomDaofu = 0L;
+			roomYufu = 0L;
+			roomPrice = roomPriceMap.get(hotelBookRoomInfo.getRoomId());
+			if (roomPrice == null) {
+				throw new ManagerException("该房型已不可预定，请重新查询酒店房型(err=3)");
 			}
-		} else {
-			// 支付旧订单
-			billingHotel = billingHotelMapper.getById(orderId);
-			if (billingHotel == null) {
-				throw new ManagerException("该订单不存在");
+			if (roomPrice.getOccupancyVos() == null || roomPrice.getOccupancyVos().isEmpty()) {
+				throw new ManagerException("该房型已不可预定，请重新查询酒店房型(err=4)");
 			}
-			if (userId == null || billingHotel.getUserId() == null || billingHotel.getUserId().equals(userId)) {
-				throw new ManagerException("您的订单不存在");
+			for (OccupancyVo occupancyVo : roomPrice.getOccupancyVos()) {
+				if (occupancyVo.getOccuId().equals(hotelBookRoomInfo.getOccuId())) {
+					occu = occupancyVo;
+					break;
+				}
 			}
-			if (billingHotel.getPayStatus().intValue() != 0 || billingHotel.getChargeStatus().intValue() != 0) {
-				throw new ManagerException("该订单已完成支付");
+			if (occu == null) {
+				throw new ManagerException("该房型已不可预定，请重新查询酒店房型(err=5)");
 			}
-			Integer result = billingHotelMapper.updatePayInfo(exchange.getExchange(), payDaofu, payType.getPayType(),
-					payYufu, orderId);
-			if (result == null || result != 1) {
-				throw new ManagerException("该订单不可支付");
+			roomYufu += Long.valueOf(new DecimalFormat("#").format(BigDecimal
+					.valueOf(Double.valueOf(occu.getOccuPubPrice())).multiply(BigDecimal.valueOf(100)).doubleValue()));
+			if (hotelBookRoomInfo.getBoadBase() != null) {
+				if (occu.getBoardbases() == null || occu.getBoardbases().isEmpty()) {
+					throw new ManagerException("该房型已不可预定，请重新查询酒店房型(err=6)");
+				}
+				for (BoardbasePrice boardbasePrice : occu.getBoardbases()) {
+					boardbasePriceMap.put(boardbasePrice.getBbId(), boardbasePrice);
+				}
+				bb = boardbasePriceMap.get(hotelBookRoomInfo.getBoadBase().getBbId());
+				if (bb == null) {
+					throw new ManagerException("该房型已不可预定，请重新查询酒店房型(err=7)");
+				}
+				roomYufu += Long.valueOf(new DecimalFormat("#").format(BigDecimal
+						.valueOf(Double.valueOf(bb.getBbPublishPrice())).multiply(BigDecimal.valueOf(100))
+						.doubleValue()));
 			}
+			if (hotelBookRoomInfo.getSupplements() != null && !hotelBookRoomInfo.getSupplements().isEmpty()) {
+				if (occu.getSupplements() == null || occu.getSupplements().isEmpty()) {
+					throw new ManagerException("该房型已不可预定，请重新查询酒店房型(err=8)");
+				}
+				for (SupplementPrice supplementPrice : occu.getSupplements()) {
+					supplementPriceMap.put(supplementPrice.getSuppId(), supplementPrice);
+				}
+				supplements = new ArrayList<BookRoomSupplement>();
+				for (BookRoomSupplement suppment : hotelBookRoomInfo.getSupplements()) {
+					supp = supplementPriceMap.get(suppment.getSuppId());
+					if (supp == null) {
+						throw new ManagerException("该房型已不可预定，请重新查询酒店房型(err=9)");
+					}
+					if (supp.getSuppChargeType() == SuppChargeType.ADD.getVal()) {
+						roomYufu += Long.valueOf(new DecimalFormat("#").format(BigDecimal
+								.valueOf(Double.valueOf(supp.getPublishPrice())).multiply(BigDecimal.valueOf(100))
+								.doubleValue()));
+					} else if (supp.getSuppChargeType() == SuppChargeType.AP.getVal()) {
+						roomDaofu += Long.valueOf(new DecimalFormat("#").format(BigDecimal
+								.valueOf(Double.valueOf(supp.getPublishPrice())).multiply(BigDecimal.valueOf(100))
+								.doubleValue()));
+					}
+					supplement = new BookRoomSupplement();
+					supplement.setPublishPrice(Long.valueOf(new DecimalFormat("#").format(BigDecimal
+							.valueOf(Double.valueOf(supp.getPublishPrice())).multiply(BigDecimal.valueOf(100))
+							.doubleValue())));
+					supplement.setSuppChargeType(supp.getSuppChargeType());
+					supplement.setSuppId(supp.getSuppId());
+					supplement.setSuppIsMandatory(supp.getSuppIsMandatory());
+					supplement.setSuppName(supp.getSuppName());
+					supplement.setSuppType(supp.getSuppType());
+					supplements.add(supplement);
+				}
+			}
+			totalRoomDaofu += roomDaofu;
+			totalRoomYufu += roomYufu;
+		}
+		if (!totalRoomDaofu.equals(billingHotel.getPriceAtproperty()) || !totalRoomYufu.equals(billingHotel.getPrice())) {
+			throw new ManagerException("该房型已不可预定，请重新查询酒店房型(err=11)");
+		}
+		// 换算人民币
+		Currency currency = Currency.getEnum(holtelDetPrice.getCurrency());
+		if (currency == null) {
+			throw new ManagerException("该币种不支持");
+		}
+		Exchange exchange = exchangeMapper.getByType(currency.getExchangeType());
+		if (exchange == null) {
+			throw new ManagerException("该币种不支持支付");
+		}
+		Long payYufu = Double.valueOf(Math.ceil(billingHotel.getPrice() * exchange.getExchange())).longValue();
+		Long payDaofu = Double.valueOf(Math.ceil(billingHotel.getPriceAtproperty() * exchange.getExchange()))
+				.longValue();
+		// 去支付网关支付
+		String subject = holtelDetPrice.getHotelName() + "-" + holtelDetPrice.getRoomType().getName();
+		String desc = holtelDetPrice.getHotelName() + "-" + holtelDetPrice.getRoomType().getName() + "-"
+				+ hotelBookRoomInfos.size() + "间房-" + holtelDetPrice.getRoomType().getNights() + "晚";
+		Integer result = billingHotelMapper.updatePayInfo(exchange.getExchange(), payDaofu, payType.getPayType(),
+				payYufu, orderId);
+		if (result == null || result != 1) {
+			throw new ManagerException("该订单不可支付");
 		}
 		String payUri = getThirdPayUrl(payType, orderId.toString(), payYufu, subject, desc);
 		if (StringUtils.isBlank(payUri)) {

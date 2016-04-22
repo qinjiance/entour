@@ -37,15 +37,15 @@
 									<span class="time">时间</span>
 									<span class="hotel">酒店</span>
 									<span>预付</span>
-									<span>状态</span>
+									<span class="st">状态</span>
 								</p>
 								<c:forEach items="${holtels}" var="bh">
 									<p class="item">
 										<span>${bh.id}</span>
 										<span class="time"><fmt:formatDate value="${bh.checkIn}" pattern="yyyy-MM-dd" /> ~ <fmt:formatDate value="${bh.checkOut}" pattern="yyyy-MM-dd" /></span>
-										<span class="hotel"><a href="${ctx}/hotelOrderDet?orderId=${bh.id}">${bh.hotelName} - ${bh.roomType} (${bh.roomNum}间)</a></span>
+										<span class="hotel"><a target="_blank" href="${ctx}/hotelOrderDet?orderId=${bh.id}">${bh.hotelName} - ${bh.roomType} (${bh.roomNum}间)</a></span>
 										<span>￥${bh.payPrice}</span>
-										<span>
+										<span class="st">
 											<c:choose>
 												<c:when test="${bh.payStatus==0}">未付款</c:when>
 												<c:when test="${bh.payStatus==1}">

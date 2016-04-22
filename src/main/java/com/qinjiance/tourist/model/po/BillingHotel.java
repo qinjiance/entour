@@ -26,10 +26,11 @@ public class BillingHotel extends BaseObject {
 	private String hotelAddress;
 	private Integer roomTypeId;
 	private String roomType;
-	private String roomNum;
+	private Integer roomNum;
 	private Date checkIn;
 	private Date checkOut;
 	private String roomInfos;
+	private String roomInfo;
 	private Long payPrice;
 	private Long price;
 	private Long payPriceAtproperty;
@@ -52,6 +53,21 @@ public class BillingHotel extends BaseObject {
 	private Date createTime;
 	private Date payTime;
 	private Date chargeTime;
+
+	/**
+	 * @return the roomInfo
+	 */
+	public String getRoomInfo() {
+		return roomInfo;
+	}
+
+	/**
+	 * @param roomInfo
+	 *            the roomInfo to set
+	 */
+	public void setRoomInfo(String roomInfo) {
+		this.roomInfo = roomInfo;
+	}
 
 	/**
 	 * @return the checkIn
@@ -326,7 +342,7 @@ public class BillingHotel extends BaseObject {
 	/**
 	 * @return the roomNum
 	 */
-	public String getRoomNum() {
+	public Integer getRoomNum() {
 		return roomNum;
 	}
 
@@ -334,7 +350,7 @@ public class BillingHotel extends BaseObject {
 	 * @param roomNum
 	 *            the roomNum to set
 	 */
-	public void setRoomNum(String roomNum) {
+	public void setRoomNum(Integer roomNum) {
 		this.roomNum = roomNum;
 	}
 

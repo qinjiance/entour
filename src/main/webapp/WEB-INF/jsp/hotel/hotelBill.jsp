@@ -32,21 +32,24 @@
 									</c:forEach>
 									</span>
 									</c:if>
-									<span>${fn:split(room.bedding,",")[1]}张床</span>
+									${fn:split(room.bedding,",")[1]}张床
 								</div>
-								<div class="colu">
-									<p>
-										<span>${room.boadBase.name}(<span class="fee">${(room.boadBase.price=='0'||room.boadBase.price=='0.00')?'免费':'预付'}${(room.boadBase.price=='0'||room.boadBase.price=='0.00')?'':(origCurrency.symbol)}${(room.boadBase.price=='0'||room.boadBase.price=='0.00')?'':(room.boadBase.price)}</span>)</span>
-									</p>
-									<p>
-										<c:forEach items="${room.supplements}" var="supp" varStatus="suppvs">
-											<span>${supp.suppName}(<span class="fee">${(supp.suppChargeType==1||supp.publishPrice=='0'||supp.publishPrice=='0.00')?'免费':((supp.suppChargeType==2)?'预付':'到付')}${(supp.suppChargeType==1||supp.publishPrice=='0'||supp.publishPrice=='0.00')?'':(origCurrency.symbol)}${(supp.suppChargeType==1||supp.publishPrice=='0'||supp.publishPrice=='0.00')?'':(supp.publishPrice)}</span>)</span>
-										</c:forEach>
-									</p>
-								</div>
-								<p class="inp"><span>联系人姓<span>*</span>&nbsp;</span>${room.contactPassenger.firstname}
-									<span>联系人名<span>*</span>&nbsp;</span>${room.contactPassenger.lastname}</p>
-								<p class="inp"><span for="phone">联系人手机<span>*</span>&nbsp;</span>${room.contactPassenger.mobilephone}</p>
+								<c:if test="${(room.boadBase!=null)||(! empty room.supplements)}">
+									<div class="colu">
+										<p>
+											<c:if test="${room.boadBase!=null}">
+												<span>${room.boadBase.name}(<span class="fee">${(room.boadBase.price=='0'||room.boadBase.price=='0.00')?'免费':'预付'}${(room.boadBase.price=='0'||room.boadBase.price=='0.00')?'':(origCurrency.symbol)}${(room.boadBase.price=='0'||room.boadBase.price=='0.00')?'':(room.boadBase.price)}</span>)</span>
+											</c:if>
+										</p>
+										<p>
+											<c:forEach items="${room.supplements}" var="supp" varStatus="suppvs">
+												<span>${supp.suppName}(<span class="fee">${(supp.suppChargeType==1||supp.publishPrice=='0'||supp.publishPrice=='0.00')?'免费':((supp.suppChargeType==2)?'预付':'到付')}${(supp.suppChargeType==1||supp.publishPrice=='0'||supp.publishPrice=='0.00')?'':(origCurrency.symbol)}${(supp.suppChargeType==1||supp.publishPrice=='0'||supp.publishPrice=='0.00')?'':(supp.publishPrice)}</span>)</span>
+											</c:forEach>
+										</p>
+									</div>
+								</c:if>
+								<p class="inp"><span>联系人姓名<span>*</span>&nbsp;</span>${room.contactPassenger.lastname} ${room.contactPassenger.firstname}</p>
+								<p class="inp"><span>联系人手机<span>*</span>&nbsp;</span>${room.contactPassenger.mobilephone}</p>
 							</div> 
 							<c:if test="${vs.last==false}">
 								<hr />
@@ -60,63 +63,61 @@
 						</div>
 						<hr />
 						<div class="eml">
-							<p class="inp"><label for="email">电子邮箱<span>*</span>&nbsp;</label><input placeholder="请输入电子邮箱地址" id="email" name="email" class="easyui-validatebox" data-options="required:true,validType:'email'" style="width:300px" /></p>
+							<p class="inp"><span for="email">电子邮箱<span>*</span>&nbsp;</span>${hotel.confirmationEmail}</p>
 						</div>
 					</div>
 				</div>
 				<div class="myright">
 					<div class="easyui-panel" data-options="border:false" style="margin:0 0 20px 0;padding:10px;background-color: inherit;">
 						<div class="hot">
-							<img src="${holtelDetPrice.thumb}" alt="${holtelDetPrice.hotelName}" />
-							<p class="htname">${holtelDetPrice.hotelName}</p>
-							<p class="stars ${holtelDetPrice.starsLevel}stars"></p>
-							<p class="htaddr">${holtelDetPrice.address},&nbsp;${holtelDetPrice.country}</p>
+							<p class="htname">${hotel.hotelName}</p>
+							<p class="htaddr">${hotel.hotelAddress},&nbsp;${hotel.hotelCountry}</p>
 						</div>
 						<div class="htdes">
-							<p><span>${fn:length(holtelDetPrice.roomType.roomPrices)}间客房:&nbsp;</span>${holtelDetPrice.roomType.name}</p>
-							<p><span>入住:&nbsp;</span>${checkIn}</p>
-							<p><span>退房:&nbsp;</span>${checkOut}</p>
-							<p>共${holtelDetPrice.roomType.nights}晚</p>
+							<p><span>${hotel.roomNum}间客房:&nbsp;</span>${hotel.roomType}</p>
+							<p><span>入住:&nbsp;</span><fmt:formatDate value="${hotel.checkIn}" pattern="yyyy-MM-dd" /></p>
+							<p><span>退房:&nbsp;</span><fmt:formatDate value="${hotel.checkOut}" pattern="yyyy-MM-dd" /></p>
 						</div>
-						<c:forEach items="${holtelDetPrice.roomType.roomPrices}" var="room" varStatus="vs">
-							<div class="htrp roomSum" roomId="${room.roomId}">
+						<c:forEach items="${rooms}" var="room" varStatus="vs">
+							<div class="htrp roomSum">
 								<p><span>客房${room.roomId}:&nbsp;</span>${room.adultNum}位成人${(room.childNum==0)?'':',&nbsp;'}${(room.childNum==0)?'':(room.childNum)}${(room.childNum==0)?'':'位儿童'}</p>
-								<c:forEach items="${room.occupancyVos}" var="occup" varStatus="occvs">
-									<div class="occup" occId="${occup.occuId}" occPrice="${occup.occuPubPrice}" style="${(occvs.index==0)?'':'display:none;'}">
-										<c:forEach items="${occup.priceBreakdown}" var="pribre" varStatus="prvs">
-											<p class="pric"><span class="ite">第${prvs.index+1}晚</span><span class="iteprice">${holtelDetPrice.currencySymbol}${pribre}</span></p>
-										</c:forEach>
-										<p class="pric"><span class="iteprice">(含税${holtelDetPrice.currencySymbol}${occup.taxPubPrice})</span></p>
-										<c:forEach items="${occup.boardbases}" var="bob" varStatus="bobvs">
-											<p class="pric bob" bbId="${bob.bbId}" style="${(bob.bbPublishPrice=='0'||bob.bbPublishPrice=='0.00')?'':'display:none;'}">
-												<span class="ite">${bob.bbName}</span><span class="iteprice">${holtelDetPrice.currencySymbol}${bob.bbPublishPrice}</span>
-											</p>
-										</c:forEach>
-										<c:forEach items="${occup.supplements}" var="supp" varStatus="suppvs">
-											<p class="pric supp" suppId="${supp.suppId}" ctype="${supp.suppChargeType}" style="${(supp.suppIsMandatory==true||supp.suppChargeType==1||supp.publishPrice=='0'||supp.publishPrice=='0.00')?'':'display:none;'}">
-												<span class="ite">${supp.suppName}</span><span class="iteprice">${(supp.suppChargeType==3)?'到店支付':''}${holtelDetPrice.currencySymbol}${supp.publishPrice}</span>
-											</p>
-										</c:forEach>
-										<p class="pric"><span class="itett">预付小计</span><span class="itepricett ">${holtelDetPrice.currencySymbol}<span class="yufu"> -</span></span></p>
-										<p class="pric"><span class="itett">到付小计</span><span class="itepricett ">${holtelDetPrice.currencySymbol}<span class="daofu"> -</span></span></p>
-									</div>
-								</c:forEach>
+								<div class="occup">
+									<p class="pric"><span class="ite">客房价</span><span class="iteprice">${origCurrency.symbol}<span class="ppp">${room.occuPrice}</span></span></p>
+									<c:if test="${room.boadBase!=null}">
+										<p class="pric bob"><span class="ite">${room.boadBase.name}</span><span class="iteprice">${origCurrency.symbol}<span class="ppp">${room.boadBase.price}</span></span></p>
+									</c:if>
+									<c:forEach items="${room.supplements}" var="supp" varStatus="suppvs">
+										<p class="pric supp"><span class="ite">${supp.suppName}</span><span class="iteprice">${(supp.suppChargeType==3)?'到店支付':''}${origCurrency.symbol}<span class="ppp">${supp.publishPrice}</span></span></p>
+									</c:forEach>
+								</div>
 							</div>
 						</c:forEach>
 						<hr />
 						<div class="htrp">
-							<p class="pric"><span class="itett">预付总计</span><span class="itepricett ">${holtelDetPrice.currencySymbol}<span class="yufutt"> -</span></span></p>
-							<p class="pric"><span class="itett">到付总计</span><span class="itepricett ">${holtelDetPrice.currencySymbol}<span class="daofutt"> -</span></span></p>
+							<p class="pric"><span class="itett">预付总计</span><span class="itepricett ">${origCurrency.symbol}<span class="yufutt ppp">${hotel.price}</span></span></p>
+							<p class="pric"><span class="itett">到付总计</span><span class="itepricett ">${origCurrency.symbol}<span class="daofutt ppp">${hotel.priceAtproperty}</span></span></p>
 						</div>
 						<hr />
-						<div class="til">
-							<p class="titt">付款方式</p>
-							<p class="tip">请选择您的付款方式后进行支付。</p>
-						</div>
-						<div class="pay">
-							<span class="on"><img src="${ctx}<fmt:message key="static.resources.host"/>/img/alipay.png" alt="alipay" /></span>
-						</div>
-						<div class="opp">下单付款</div> 
+						<c:choose>
+							<c:when test="${hotel.payStatus==0}">
+								<div class="til">
+									<p class="titt">付款方式</p>
+									<p class="tip">请选择您的付款方式后进行支付。</p>
+								</div>
+								<div class="pay">
+									<span class="on"><img src="${ctx}<fmt:message key="static.resources.host"/>/img/alipay.png" alt="alipay" /></span>
+								</div>
+								<div class="opp">下单付款</div> 
+							</c:when>
+							<c:when test="${hotel.payStatus==1}">
+								<c:choose>
+									<c:when test="${(hotel.chargeStatus==0)||(hotel.chargeStatus==2)}"><span class="stu">订单处理中</span></c:when>
+									<c:when test="${hotel.chargeStatus==1}"><span class="stu">预定成功</span></c:when>
+									<c:otherwise><span class="stu">预定失败，请联系客服</span></c:otherwise>
+								</c:choose>
+							</c:when>
+							<c:otherwise><span class="stu">付款失败</span></c:otherwise>
+						</c:choose>
 					</div>
 				</div>
 		</div>
@@ -151,17 +152,8 @@
         <a href="javascript:void(0)" class="easyui-linkbutton errorclose">确定</a>
     </div>
     
-	<form id="hotelPrepay" action="${ctx}/hotelPrepay">
-		<input type="hidden" name="orderId" value="${orderId}" />
-		<input type="hidden" name="hotelId" value="${hotelId}" />
-		<input type="hidden" name="checkIn" value="${checkIn}" />
-		<input type="hidden" name="checkOut" value="${checkOut}" />
-		<input type="hidden" name="roomInfo" value="${roomInfo}" />
-		<input type="hidden" name="hotelRoomTypeId" value="${hotelRoomTypeId}" />
-		<input type="hidden" name="hotelBookRoomInfosStr" value="${hotelBookRoomInfosStr}" />
-		<input type="hidden" name="bookCurrency" value="${holtelDetPrice.currency}" />
-		<input type="hidden" name="totalYufu" value="" />
-		<input type="hidden" name="totalDaofu" value="" />
+	<form id="hotelPrepay" action="${ctx}/hotelRepay">
+		<input type="hidden" name="orderId" value="${hotel.id}" />
 	</form>
 
 	<!-- footer -->
@@ -268,72 +260,26 @@
 			if(!$("#inp").form("validate")){
 				return;
 			}
-			sum();
-			var confirmEmail = $("input[name=email]").val();
-			if(!confirmEmail){
-				return;
-			}
 			if(!payTypeId){
 				return 
 			}
-			var hotelId = $("input[name=hotelId]").val();
-			if(!hotelId){
-				return;
-			}
-			var checkIn = $("input[name=checkIn]").val();
-			if(!checkIn){
-				return;
-			}
-			var checkOut = $("input[name=checkOut]").val();
-			if(!checkOut){
-				return;
-			}
-			var roomInfo = $("input[name=roomInfo]").val();
-			if(!roomInfo){
-				return;
-			}
-			var hotelRoomTypeId = $("input[name=hotelRoomTypeId]").val();
-			if(!hotelRoomTypeId){
-				return;
-			}
-			var totalYufu = $("input[name=totalYufu]").val();
-			if(!totalYufu.trim()){
-				return;
-			}
-			var totalDaofu = $("input[name=totalDaofu]").val();
-			if(!totalDaofu.trim()){
-				return;
-			}
-			var bookCurrency = $("input[name=bookCurrency]").val();
-			if(!bookCurrency.trim()){
-				return;
-			}
-			var hotelBookRoomInfosStr = $("input[name=hotelBookRoomInfosStr]").val();
-			if(!hotelBookRoomInfosStr){
+			var orderId = $("input[name=orderId]").val();
+			if(!orderId){
 				return;
 			}
 			var data = {
-					hotelId : hotelId,
-					checkIn : checkIn,
-					checkOut : checkOut,
-					hotelBookRoomInfosStr : hotelBookRoomInfosStr,
-					roomInfo : roomInfo,
-					hotelRoomTypeId : hotelRoomTypeId,
-					confirmEmail : confirmEmail,
 					payTypeId : payTypeId,
-					totalDaofu : totalDaofu,
-					totalYufu : totalYufu,
-					bookCurrency : bookCurrency
+					orderId : orderId
 			};
 			openLoading();
 			$.ajax({
 			    type: 'get',
-			    url: '${ctx}hotelPrepay',
+			    url: '${ctx}hotelRepay',
 			    data: data,
 			    success: function(ret) {
 			    	if(ret.code==0){
 			    		$("input[name=orderId]").val(ret.result.orderId);
-			    		$("#topay .mon").html('${holtelDetPrice.currencySymbol}'+$(".yufutt").html());
+			    		$("#topay .mon").html('${origCurrency.symbol}${hotel.price}');
 						$("#bb a").attr("href",ret.result.payUri);
 						$('#topay').dialog({
 							closed:false,
@@ -371,129 +317,12 @@
 		function closeLoading() {
 			$("#myDialogbox").hide();
 		}
-		function sum(){
-			var sum=0;
-			var daofuSum=0;
-			var hotelBookRoomInfos=[];
-			$(".room").each(function(i,e){
-				var hotelBookRoomInfo={};
-				var suppIds=[];
-				var roomId=$(this).attr('roomId');
-				var occuId=$(this).find("select[name=bedding]").val();
-				var occuPrice=Number($(this).find(".colu[occId='"+occuId+"']").attr("occPrice"));
-				var daofuPrice=0;
-				$(this).find("input[name=bob]").each(function(i,e){
-					if($(e).prop("checked")){
-						occuPrice+=Number($(e).attr("bobPrice"));
-						hotelBookRoomInfo.bbId=$(e).val();
-					}
-				});
-				$(this).find("input[name=supp]").each(function(i,e){
-					if($(e).prop("checked")){
-						suppIds.push($(e).val());
-						if($(e).attr("suppChargeType")==2){
-							occuPrice+=Number($(e).attr("suppPrice"));
-						}else if($(e).attr("suppChargeType")==3){
-							daofuPrice+=Number($(e).attr("suppPrice"));
-						}
-					}
-				});
-				$(".roomSum[roomId="+roomId+"] .occup[occId='"+occuId+"'] .yufu").html(occuPrice.toFixed(2));
-				$(".roomSum[roomId="+roomId+"] .occup[occId='"+occuId+"'] .daofu").html(daofuPrice.toFixed(2));
-				sum+=occuPrice;
-				daofuSum+=daofuPrice;
-
-				hotelBookRoomInfo.roomId=roomId;
-				hotelBookRoomInfo.occuId=occuId;
-				hotelBookRoomInfo.yufu=(Number(occuPrice)*100).toFixed(0);
-				hotelBookRoomInfo.daofu=(Number(daofuPrice)*100).toFixed(0);
-				hotelBookRoomInfo.suppIds=suppIds;
-				hotelBookRoomInfo.firstname=$(this).find("input[name=firstname]").val();
-				hotelBookRoomInfo.lastname=$(this).find("input[name=lastname]").val();
-				hotelBookRoomInfo.phonenumber=$(this).find("select[name=ccode]").val()+"-"+$(this).find("input[name=phone]").val();
-				hotelBookRoomInfos.push(hotelBookRoomInfo);
-			});
-			$("input[name=hotelBookRoomInfosStr]").val(stringToHex(JSON.stringify(hotelBookRoomInfos)));
-			
-			$(".yufutt").html(sum);
-			$("input[name=totalYufu]").val((Number(sum)*100).toFixed(0));
-			$(".daofutt").html(daofuSum);
-			$("input[name=totalDaofu]").val((Number(daofuSum)*100).toFixed(0));
-		}
 		$(document).ready(function(){
-			var mytotalstar=5;
-			$(".stars").each(function(index, element) {
-		       var classs=$(this).get(0).className;
-			   var classArr=String(classs).split(" ");
-			   var starNum=0,i;
-			   var myhalf=false;
-			   for( i=0;i<classArr.length;i++){
-				  	if(classArr[i].indexOf("stars")>0){
-					     if(classArr[i].indexOf(".")>0)myhalf=true;
-						starNum=parseInt(classArr[i]);
-					     break;
-					  }
-				   }
-				var myhtml="";
-				var myemptyNum=mytotalstar-starNum;
-				for(i=0;i<starNum;i++){
-					myhtml+='<em class="full"></em>';
-					}
-				if(starNum){
-					myhtml+='<em class="half"></em>';
-					myemptyNum--;
-					}
-				for(i=0;i<myemptyNum;i++){
-					myhtml+='<em class="empty"></em>';
-					}
-				$(this).html(myhtml);
+			$(".ppp").each(function(i,e){
+				var ppp = $(this).html();
+				ppp = (Number(ppp)/100).toFixed(2);
+				$(this).html(ppp);
 			});
-			$.extend($.fn.validatebox.defaults.rules, {
-			    alphabet: {
-			        validator: function(value){
-			            return /^[',\-\.]*[a-zA-Z\u00C0-\u00FF]+[a-zA-Z\u00C0-\u00FF',\-\.]*$/.test(value);
-			        },
-			        message: 'Please enter alphabets.'
-			    },
-			    number: {
-			        validator: function(value){
-			            return /^[0-9]+$/.test(value);
-			        },
-			        message: 'Please enter numbers.'
-			    }
-			});
-			$("select[name=bedding]").change(function(){
-				var roomId=$(this).closest(".room").attr("roomId");
-				var occuId=$(this).val();
-				$(".room[roomId="+roomId+"] .colu").hide();
-				$(".room[roomId="+roomId+"] .colu[occId='"+occuId+"']").show();
-				$(".roomSum[roomId="+roomId+"] .occup").hide();
-				$(".roomSum[roomId="+roomId+"] .occup[occId='"+occuId+"']").show();
-				sum();
-			});
-			$("input[name=bob]").change(function(){
-				var roomId=$(this).closest(".room").attr("roomId");
-				var occuId=$(this).closest(".colu").attr("occId");
-				var bbId=$(this).val();
-				if($(this).prop('checked')){
-					$(".roomSum[roomId="+roomId+"] .occup[occId='"+occuId+"'] .bob[bbId="+bbId+"]").show();
-				}else{
-					$(".roomSum[roomId="+roomId+"] .occup[occId='"+occuId+"'] .bob[bbId="+bbId+"]").hide();
-				}
-				sum();
-			});
-			$("input[name=supp]").change(function(){
-				var roomId=$(this).closest(".room").attr("roomId");
-				var occuId=$(this).closest(".colu").attr("occId");
-				var suppId=$(this).val();
-				if($(this).prop('checked')){
-					$(".roomSum[roomId="+roomId+"] .occup[occId='"+occuId+"'] .supp[suppId="+suppId+"]").show();
-				}else{
-					$(".roomSum[roomId="+roomId+"] .occup[occId='"+occuId+"'] .supp[suppId="+suppId+"]").hide();
-				}
-				sum();
-			});
-			sum();
 			$(".opp").click(function(){
 				prepay(1);
 			});
@@ -512,6 +341,7 @@
 				window.location.reload();
 			});
 			$(".payed").click(function(){
+				$('#paying').dialog('close');
 				checkResult();
 			});
 			$(".errorclose").click(function(){

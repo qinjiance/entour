@@ -5,7 +5,8 @@
 .rightD .content p.item{font-size: 13px;}
 .rightD .content p span{display: inline-block;width: 50px;}
 .rightD .content p span.time{width: 150px;}
-.rightD .content p span.hotel{width: 500px;}
+.rightD .content p span.hotel{width: 400px;}
+.rightD .content p span.st{width: 150px;}
 .rightD .content p.header span.name{width:360px;}
 .rightD .content p.header span.time{width:170px;}
 .rightD .content p.header span.op{width:110px;}

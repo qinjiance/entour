@@ -106,7 +106,7 @@ public class HotelController extends BaseTouristController {
 				model.put("origCurrency", origCurrency);
 				model.put("payCurrency", payCurrency);
 			}
-			model.put("holtel", ret);
+			model.put("hotel", ret);
 		} catch (ManagerException e) {
 			logger.error("ManagerException: ", e);
 		}
@@ -182,17 +182,35 @@ public class HotelController extends BaseTouristController {
 	@NeedCookie
 	@RequestMapping(value = "/hotelPrepay")
 	@ResponseBody
-	public ResponseResult<Map<String, String>> hotelPrepay(Long orderId, @RequestParam Integer hotelId,
-			@RequestParam Date checkIn, @RequestParam Date checkOut, @RequestParam String hotelBookRoomInfosStr,
-			@RequestParam String roomInfo, @RequestParam Integer hotelRoomTypeId, @RequestParam String confirmEmail,
-			@RequestParam Integer payTypeId, @RequestParam Long totalDaofu, @RequestParam Long totalYufu,
-			@RequestParam String bookCurrency) {
+	public ResponseResult<Map<String, String>> hotelPrepay(@RequestParam Integer hotelId, @RequestParam Date checkIn,
+			@RequestParam Date checkOut, @RequestParam String hotelBookRoomInfosStr, @RequestParam String roomInfo,
+			@RequestParam Integer hotelRoomTypeId, @RequestParam String confirmEmail, @RequestParam Integer payTypeId,
+			@RequestParam Long totalDaofu, @RequestParam Long totalYufu, @RequestParam String bookCurrency) {
 		ResponseResult<Map<String, String>> rr = new ResponseResult<Map<String, String>>();
 		rr.setCode(Constants.CODE_FAIL);
 		try {
-			Map<String, String> ret = hotelManager.prePay(orderId, hotelId, checkIn, checkOut, hotelBookRoomInfosStr,
-					roomInfo, hotelRoomTypeId, confirmEmail, payTypeId, totalDaofu, totalYufu,
-					CookieUtil.getUserIdFromCookie(), bookCurrency);
+			Map<String, String> ret = hotelManager.prePay(hotelId, checkIn, checkOut, hotelBookRoomInfosStr, roomInfo,
+					hotelRoomTypeId, confirmEmail, payTypeId, totalDaofu, totalYufu, CookieUtil.getUserIdFromCookie(),
+					bookCurrency);
+			rr.setCode(Constants.CODE_SUCC);
+			rr.setResult(ret);
+		} catch (ManagerException e) {
+			rr.setMessage(e.getMessage());
+		}
+		return rr;
+	}
+
+	/**
+	 * @return
+	 */
+	@NeedCookie
+	@RequestMapping(value = "/hotelRepay")
+	@ResponseBody
+	public ResponseResult<Map<String, String>> hotelRepay(@RequestParam Long orderId, @RequestParam Integer payTypeId) {
+		ResponseResult<Map<String, String>> rr = new ResponseResult<Map<String, String>>();
+		rr.setCode(Constants.CODE_FAIL);
+		try {
+			Map<String, String> ret = hotelManager.rePay(orderId, payTypeId, CookieUtil.getUserIdFromCookie());
 			rr.setCode(Constants.CODE_SUCC);
 			rr.setResult(ret);
 		} catch (ManagerException e) {
