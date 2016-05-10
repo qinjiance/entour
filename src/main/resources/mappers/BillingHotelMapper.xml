@@ -7,13 +7,13 @@
 		billing_hotel
 		(id, username, user_id, transaction_num, rgid, hotel_country, hotel_city, hotel_id, hotel_name, 
 		hotel_address, room_type_id, room_type, room_num ,check_in, check_out, room_infos, room_info, pay_price, pay_price_atproperty,
-		price, price_atproperty, payment_type, pay_type, contact_info, delta_price, currency, pay_currency, exchange,
+		price, price_atproperty, payment_type, pay_type, contact_info, delta_price, currency, pay_currency, exchange, real_pay_amount
 		is_only_available, confirmation_email, confirmation_logo, pay_status, gateway_order_id, pay_failed_info, charge_status,
 		charge_failed_info, create_time, pay_time, charge_time)
 		VALUES
 		(#{id}, #{username}, #{userId}, #{transactionNum}, #{rgid}, #{hotelCountry}, #{hotelCity}, #{hotelId}, #{hotelName},
 		#{hotelAddress}, #{roomTypeId}, #{roomType}, #{roomNum}, #{checkIn}, #{checkOut}, #{roomInfos}, #{roomInfo}, #{payPrice}, #{payPriceAtproperty}, 
-		#{price}, #{priceAtproperty}, #{paymentType}, #{payType}, #{contactInfo}, #{deltaPrice}, #{currency}, #{payCurrency}, #{exchange},
+		#{price}, #{priceAtproperty}, #{paymentType}, #{payType}, #{contactInfo}, #{deltaPrice}, #{currency}, #{payCurrency}, #{exchange}, #{realPayAmount}
 		#{isOnlyAvailable}, #{confirmationEmail}, #{confirmationLogo}, #{payStatus}, #{gatewayOrderId}, #{payFailedInfo}, #{chargeStatus},
 		#{chargeFailedInfo}, now(), #{payTime}, #{chargeTime})
 	</insert>

@@ -31,6 +31,7 @@ public class BillingHotel extends BaseObject {
 	private Date checkOut;
 	private String roomInfos;
 	private String roomInfo;
+	private Long realPayAmount;
 	private Long payPrice;
 	private Long price;
 	private Long payPriceAtproperty;
@@ -53,6 +54,20 @@ public class BillingHotel extends BaseObject {
 	private Date createTime;
 	private Date payTime;
 	private Date chargeTime;
+
+	/**
+	 * @return the realPayAmount
+	 */
+	public Long getRealPayAmount() {
+		return realPayAmount;
+	}
+
+	/**
+	 * @param realPayAmount the realPayAmount to set
+	 */
+	public void setRealPayAmount(Long realPayAmount) {
+		this.realPayAmount = realPayAmount;
+	}
 
 	/**
 	 * @return the roomInfo
